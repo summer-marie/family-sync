@@ -1,0 +1,42 @@
+# Dependencies
+/node_modules
+
+# Next.js build output
+/.next
+/out
+
+# Build folders
+/dist
+/build
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environment files / secrets
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+
+# Coverage and test output
+/coverage
+/playwright-report
+/test-results
+
+# OS / editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Temporary local files
+*.tmp
+*.temp
