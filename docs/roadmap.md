@@ -30,7 +30,7 @@ In scope:
 
 Locked stack (do not replace without explicit approval):
 - Next.js (App Router)
-- Prisma ORM
+- Prisma ORMhe
 - Neon Postgres
 - Auth.js
 - Google OAuth
