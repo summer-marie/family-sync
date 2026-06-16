@@ -1,3 +1,4 @@
+// Error will go away once there is content in the ui
 import { PrismaClient } from '@prisma/client'
 
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient }
