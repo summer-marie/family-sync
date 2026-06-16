@@ -1,0 +1,2 @@
+# This file ensures docs/tdd/logs/ exists after a fresh clone.
+# Captured RED/GREEN log output is gitignored; this folder is for local use only.
