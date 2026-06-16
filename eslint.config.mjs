@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // E2E tests are Playwright fixtures, not React components. The
+    // react-hooks/rules-of-hooks rule misfires on Playwright's use() callback.
+    "e2e/**",
   ]),
 ]);
 
