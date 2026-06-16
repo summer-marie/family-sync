@@ -34,7 +34,13 @@ export function applyPrivacyFilter(
     return { ...event };
   }
 
-  // BUSY_ONLY: strip the title, keep timing information only.
-  const { title: _title, ...withoutTitle } = event;
-  return { ...withoutTitle, title: BUSY_LABEL };
+  // BUSY_ONLY: keep timing information only and replace the title with the
+  // privacy-safe Busy label. Build a new object so the input is never mutated
+  // and no reference to the original title is retained.
+  return {
+    title: BUSY_LABEL,
+    start: event.start,
+    end: event.end,
+    isAllDay: event.isAllDay,
+  };
 }
