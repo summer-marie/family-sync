@@ -44,3 +44,6 @@ next-env.d.ts
 
 # local records
 records/
+
+# playwright auth state
+e2e/.auth/
