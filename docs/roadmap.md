@@ -419,29 +419,29 @@ These need your call before the relevant step can proceed:
 Update these as you go. Add a short note when something blocks a step.
 
 ### Step 0 - Config fix
-- [ ] Add `@/*` alias to `vitest.config.ts`
-- [ ] Verify a `@/lib/...` import resolves in a test run
+- [x] Add `@/*` alias to `vitest.config.ts`
+- [x] Verify a `@/lib/...` import resolves in a test run
 
 ### Step 1 - Schedule library
-- [ ] Write failing tests for `normalize.ts`
-- [ ] Capture `01-normalize-red.txt`
-- [ ] Implement `normalize.ts` to green
-- [ ] Write failing tests for `privacy.ts`
-- [ ] Capture `02-privacy-red.txt`
-- [ ] Implement `privacy.ts` to green
-- [ ] Write failing tests for `question-parser.ts`
-- [ ] Capture `03-question-parser-red.txt`
-- [ ] Implement `question-parser.ts` to green
+- [x] Write failing tests for `normalize.ts`
+- [x] Capture `01-normalize-red.txt`
+- [x] Implement `normalize.ts` to green
+- [x] Write failing tests for `privacy.ts`
+- [x] Capture `02-privacy-red.txt`
+- [x] Implement `privacy.ts` to green
+- [x] Write failing tests for `question-parser.ts`
+- [x] Capture `03-question-parser-red.txt`
+- [x] Implement `question-parser.ts` to green
 
 ### Step 2 - Auth and Family Access (spec 003)
-- [ ] Confirm schema proposal
-- [ ] Migration applied
-- [ ] Write failing integration tests
-- [ ] Capture `04-auth-family-red.txt`
-- [ ] Implement to green
-- [ ] Write failing E2E tests
-- [ ] Capture `04-auth-family-e2e-red.txt`
-- [ ] Implement to green
+- [x] Confirm schema proposal
+- [x] Migration applied
+- [x] Write failing integration tests
+- [x] Capture `04-auth-family-red.txt`
+- [x] Implement to green
+- [x] Write failing E2E tests
+- [x] Capture `04-auth-family-e2e-red.txt`
+- [x] Implement to green
 
 ### Step 3 - Calendar Connection (spec 002)
 - [ ] Confirm schema proposal
