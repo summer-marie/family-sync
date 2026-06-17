@@ -116,6 +116,7 @@ export async function getConnectionForUser(userId: string): Promise<{
   userId: string;
   provider: string;
   status: ConnectionStatus;
+  visibility: Visibility;
   lastConnectedAt: Date;
 } | null> {
   const connection = await prisma.calendarConnection.findFirst({

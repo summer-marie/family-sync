@@ -7,6 +7,7 @@ import {
   getConnectionForUser,
   getFamilySchedule,
 } from "@/features/calendar/services";
+import { updateVisibility } from "@/features/calendar/actions";
 import { ConnectCalendarButton } from "@/components/schedule/connect-calendar-button";
 
 // ---------------------------------------------------------------------------
@@ -21,6 +22,41 @@ import { ConnectCalendarButton } from "@/components/schedule/connect-calendar-bu
 //
 // MVP constraints: pull-on-demand only, no background sync, 7-day window.
 // ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+// VisibilityToggle - inline server-component form for updating the logged-in
+// user's calendar visibility preference. Submits via updateVisibility action.
+// ---------------------------------------------------------------------------
+
+function VisibilityToggle({ isBusyOnly }: { isBusyOnly: boolean }) {
+  return (
+    <section className="mb-6 rounded border p-4">
+      <h2 className="mb-2 text-sm font-semibold">Your visibility settings</h2>
+      <form action={updateVisibility}>
+        <label className="flex cursor-pointer items-center gap-2">
+          <input
+            type="checkbox"
+            name="busyOnly"
+            defaultChecked={isBusyOnly}
+            aria-label="Hide my event titles from family members"
+          />
+          <span className="text-sm">Hide my event titles from family members</span>
+        </label>
+        <button
+          type="submit"
+          className="mt-3 rounded bg-gray-100 px-3 py-1 text-sm hover:bg-gray-200"
+        >
+          Save
+        </button>
+      </form>
+      {isBusyOnly && (
+        <p className="mt-2 text-xs text-amber-700">
+          Your event titles are hidden from family members.
+        </p>
+      )}
+    </section>
+  );
+}
 
 export default async function SchedulePage() {
   const session = await auth();
@@ -54,6 +90,12 @@ export default async function SchedulePage() {
             </p>
             <ConnectCalendarButton />
           </section>
+        )}
+
+        {myConnection && (
+          <VisibilityToggle
+            isBusyOnly={myConnection.visibility === "BUSY_ONLY"}
+          />
         )}
 
         <section aria-label="Family schedule">
@@ -103,6 +145,10 @@ export default async function SchedulePage() {
           </p>
           <ConnectCalendarButton />
         </section>
+      )}
+
+      {myConnection && (
+        <VisibilityToggle isBusyOnly={myConnection.visibility === "BUSY_ONLY"} />
       )}
 
       <section aria-label="Family schedule">

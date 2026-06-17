@@ -459,9 +459,9 @@ Update these as you go. Add a short note when something blocks a step.
 - [x] Write failing integration tests
 - [x] Capture `11-privacy-controls-red.txt`
 - [x] Implement to green (services.ts applies applyPrivacyFilter per member)
-- [x] Write failing E2E tests (2 RED placeholders in e2e/privacy-controls.spec.ts)
-- [ ] Capture E2E green — blocked: visibility settings UI and E2E seeding not yet built
-- [ ] Implement E2E to green — requires: visibility toggle UI + server action + global-setup seeding
+- [x] Write E2E tests (e2e/privacy-controls.spec.ts — serial, real assertions)
+- [x] Implement E2E to green (visibility toggle UI + updateVisibility action + privacy-user seeding)
+- [x] Capture E2E green — 2/2 passing
 
 ### Step 5 - AI Schedule Chat (spec 001)
 - [ ] Write failing integration tests for `app/api/chat/route.ts`
