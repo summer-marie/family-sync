@@ -112,6 +112,7 @@ const mockConnection = {
   userId: "user-1",
   provider: "google",
   status: "CONNECTED" as const,
+  visibility: "FULL" as const,
   lastConnectedAt: new Date("2024-06-01"),
   createdAt: new Date("2024-06-01"),
   updatedAt: new Date("2024-06-01"),

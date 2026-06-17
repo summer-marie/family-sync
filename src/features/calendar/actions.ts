@@ -2,6 +2,7 @@
 
 import { auth } from "@/auth";
 import { revalidatePath } from "next/cache";
+import { prisma } from "@/lib/prisma";
 import {
   createConnection,
   ValidationError,
@@ -31,6 +32,27 @@ export async function connectCalendarAction(): Promise<void> {
       throw error;
     }
   }
+
+  revalidatePath("/schedule");
+}
+
+/**
+ * Persist the logged-in user's calendar visibility preference.
+ * Checkbox value "on" means BUSY_ONLY; absent means FULL.
+ */
+export async function updateVisibility(formData: FormData): Promise<void> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    throw new Error("You must be signed in.");
+  }
+
+  const busyOnly = formData.get("busyOnly") === "on";
+  const visibility = busyOnly ? "BUSY_ONLY" : "FULL";
+
+  await prisma.calendarConnection.updateMany({
+    where: { userId: session.user.id, provider: "google" },
+    data: { visibility },
+  });
 
   revalidatePath("/schedule");
 }

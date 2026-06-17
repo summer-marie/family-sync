@@ -454,14 +454,14 @@ Update these as you go. Add a short note when something blocks a step.
 - [x] Implement to green
 
 ### Step 4 - Privacy Controls (spec 004)
-- [ ] Confirm visibility field on `CalendarConnection`
-- [ ] Migration applied
-- [ ] Write failing integration tests
-- [ ] Capture `06-privacy-controls-red.txt`
-- [ ] Implement to green
-- [ ] Write failing E2E tests
-- [ ] Capture `06-privacy-controls-e2e-red.txt`
-- [ ] Implement to green
+- [x] Confirm visibility field on `CalendarConnection`
+- [x] Migration applied (20260617161944_add_visibility_to_calendar_connection)
+- [x] Write failing integration tests
+- [x] Capture `11-privacy-controls-red.txt`
+- [x] Implement to green (services.ts applies applyPrivacyFilter per member)
+- [x] Write E2E tests (e2e/privacy-controls.spec.ts — serial, real assertions)
+- [x] Implement E2E to green (visibility toggle UI + updateVisibility action + privacy-user seeding)
+- [x] Capture E2E green — 2/2 passing
 
 ### Step 5 - AI Schedule Chat (spec 001)
 - [ ] Write failing integration tests for `app/api/chat/route.ts`

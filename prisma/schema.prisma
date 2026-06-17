@@ -143,22 +143,25 @@ model Invite {
 }
 
 // ---------------------------------------------------------------------------
-// Calendar connection (Step 3 - spec 002)
+// Calendar connection (Step 3 - spec 002 / Step 4 - spec 004)
 //
 // MVP rules:
 // - One Google Calendar connection per user, enforced by
 //   @@unique([userId, provider]). For MVP, provider is always "google".
 // - Calendar data is fetched live from Google on request (pull-on-demand).
 //   No background sync, no webhooks, no Neon mirror as the default.
-// - Visibility (FULL vs BUSY_ONLY) is added separately in Step 4 on this same
-//   model; it is intentionally not part of Step 3.
+//
+// Visibility (Step 4 - spec 004):
+// - Binary per connection: FULL exposes event titles; BUSY_ONLY replaces
+//   all titles with "Busy" before any schedule output or AI prompt is built.
+// - Default is FULL (user opts in to privacy, not out of it).
+// - applyPrivacyFilter in src/lib/schedule/privacy.ts enforces this rule.
 //
 // Failed/expired reads:
 // - On a failed or expired Google read, the service returns a privacy-safe
 //   `unavailable` state rather than leaking partial or stale data.
-// - There is NO silent token auto-refresh in Step 3. Reconnect = the user
-//   re-authenticates via Google OAuth. Auto-refresh may be revisited later;
-//   if added, it must be covered by dedicated tests.
+// - There is NO silent token auto-refresh. Reconnect = the user
+//   re-authenticates via Google OAuth.
 // ---------------------------------------------------------------------------
 
 model CalendarConnection {
@@ -166,6 +169,7 @@ model CalendarConnection {
   userId          String
   provider        String           @default("google")
   status          ConnectionStatus @default(CONNECTED)
+  visibility      Visibility       @default(FULL)
   lastConnectedAt DateTime         @default(now())
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
@@ -183,4 +187,9 @@ enum ConnectionStatus {
   CONNECTED
   DISCONNECTED
   ERROR
+}
+
+enum Visibility {
+  FULL
+  BUSY_ONLY
 }

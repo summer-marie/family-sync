@@ -11,6 +11,14 @@ dotenv.config({ path: path.resolve(process.cwd(), '.env') })
 
 const TEST_USER_EMAIL = 'e2e-test@family-sync.test'
 const TEST_USER_NAME = 'E2E Test User'
+
+// Separate user for privacy-controls E2E tests. This user always has a
+// CalendarConnection seeded (reset to FULL on each run) so the visibility
+// toggle is visible from the first test without affecting the main test user,
+// whose tests rely on having no connection seeded.
+const PRIVACY_TEST_USER_EMAIL = 'e2e-privacy@family-sync.test'
+const PRIVACY_TEST_USER_NAME = 'E2E Privacy User'
+
 const AUTH_DIR = path.join(process.cwd(), 'e2e', '.auth')
 
 async function globalSetup() {
@@ -19,6 +27,11 @@ async function globalSetup() {
   })
 
   try {
+    // -----------------------------------------------------------------------
+    // Main test user (e2e-test@family-sync.test)
+    // No CalendarConnection seeded — calendar-connection E2E tests rely on
+    // the "no connection" state to test the connect prompt and unavailable UI.
+    // -----------------------------------------------------------------------
     const user = await prisma.user.upsert({
       where: { email: TEST_USER_EMAIL },
       update: {},
@@ -45,31 +58,72 @@ async function globalSetup() {
     fs.mkdirSync(AUTH_DIR, { recursive: true })
     fs.writeFileSync(
       path.join(AUTH_DIR, 'user.json'),
-      JSON.stringify(
-        {
-          cookies: [
-            {
-              name: 'authjs.session-token',
-              value: sessionToken,
-              domain: 'localhost',
-              path: '/',
-              expires: Math.floor(expires.getTime() / 1000),
-              httpOnly: true,
-              secure: false,
-              sameSite: 'Lax',
-            },
-          ],
-          origins: [],
-        },
-        null,
-        2,
-      ),
+      JSON.stringify(buildStorageState(sessionToken, expires), null, 2),
     )
 
     console.log(`[global-setup] seeded test user: ${user.email}`)
     console.log('[global-setup] auth state written to e2e/.auth/user.json')
+
+    // -----------------------------------------------------------------------
+    // Privacy test user (e2e-privacy@family-sync.test)
+    // Always has a CalendarConnection with visibility FULL (reset each run)
+    // so the visibility toggle is visible from the start of privacy E2E tests.
+    // No family group seeded — privacy tests operate in the solo schedule view.
+    // -----------------------------------------------------------------------
+    const privacyUser = await prisma.user.upsert({
+      where: { email: PRIVACY_TEST_USER_EMAIL },
+      update: {},
+      create: { email: PRIVACY_TEST_USER_EMAIL, name: PRIVACY_TEST_USER_NAME },
+    })
+
+    // Reset visibility to FULL on every run so Test 1 always starts with FULL.
+    await prisma.calendarConnection.upsert({
+      where: { userId_provider: { userId: privacyUser.id, provider: 'google' } },
+      update: { visibility: 'FULL', status: 'CONNECTED' },
+      create: {
+        userId: privacyUser.id,
+        provider: 'google',
+        status: 'CONNECTED',
+        visibility: 'FULL',
+      },
+    })
+
+    await prisma.session.deleteMany({ where: { userId: privacyUser.id } })
+
+    const privacySessionToken = randomUUID()
+    const privacyExpires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+
+    await prisma.session.create({
+      data: { sessionToken: privacySessionToken, userId: privacyUser.id, expires: privacyExpires },
+    })
+
+    fs.writeFileSync(
+      path.join(AUTH_DIR, 'privacy-user.json'),
+      JSON.stringify(buildStorageState(privacySessionToken, privacyExpires), null, 2),
+    )
+
+    console.log(`[global-setup] seeded privacy test user: ${privacyUser.email}`)
+    console.log('[global-setup] privacy auth state written to e2e/.auth/privacy-user.json')
   } finally {
     await prisma.$disconnect()
+  }
+}
+
+function buildStorageState(sessionToken: string, expires: Date) {
+  return {
+    cookies: [
+      {
+        name: 'authjs.session-token',
+        value: sessionToken,
+        domain: 'localhost',
+        path: '/',
+        expires: Math.floor(expires.getTime() / 1000),
+        httpOnly: true,
+        secure: false,
+        sameSite: 'Lax',
+      },
+    ],
+    origins: [],
   }
 }
 

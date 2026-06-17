@@ -4,7 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { getGoogleAccessToken } from "@/lib/google/get-access-token";
 import { listCalendarEvents } from "@/lib/google/calendar";
 import { normalizeEvents } from "@/lib/schedule/normalize";
-import type { ScheduleEvent } from "@/lib/schedule/privacy";
+import { applyPrivacyFilter } from "@/lib/schedule/privacy";
+import type { ScheduleEvent, Visibility } from "@/lib/schedule/privacy";
 
 // ---------------------------------------------------------------------------
 // Error types
@@ -115,6 +116,7 @@ export async function getConnectionForUser(userId: string): Promise<{
   userId: string;
   provider: string;
   status: ConnectionStatus;
+  visibility: Visibility;
   lastConnectedAt: Date;
 } | null> {
   const connection = await prisma.calendarConnection.findFirst({
@@ -279,10 +281,17 @@ async function buildMemberScheduleEntry(
     const rawEvents = await listCalendarEvents(accessToken, timeMin, timeMax);
     const events = normalizeEvents(rawEvents);
 
+    // Apply the member's visibility setting before returning. This is the
+    // mandatory privacy boundary: no calendar-derived output leaves this
+    // service without going through applyPrivacyFilter (AGENTS.md).
+    const filtered = events.map((event) =>
+      applyPrivacyFilter(event, connection.visibility as Visibility),
+    );
+
     return {
       userId,
       status: "connected",
-      events,
+      events: filtered,
     };
   } catch {
     // Privacy-safe degradation: never leak partial data, never crash the
