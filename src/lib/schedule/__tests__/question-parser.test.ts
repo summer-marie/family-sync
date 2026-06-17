@@ -42,6 +42,14 @@ describe("parseQuestion", () => {
         QuestionType.FREE_WINDOW
       );
     });
+
+    it("resolves to FREE_WINDOW not FREE_AT_TIME for 'When is everyone free this Sunday?'", () => {
+      // This input overlaps both patterns: "everyone free" would match FREE_AT_TIME
+      // if the check order were reversed. This test enforces the documented priority.
+      expect(parseQuestion("When is everyone free this Sunday?")).toBe(
+        QuestionType.FREE_WINDOW
+      );
+    });
   });
 
   describe("SUMMARIZE_CONFLICTS_DAY — what is on the schedule for a day", () => {
@@ -79,6 +87,23 @@ describe("parseQuestion", () => {
 
     it("returns OUT_OF_SCOPE for an empty string", () => {
       expect(parseQuestion("")).toBe(QuestionType.OUT_OF_SCOPE);
+    });
+
+    // BUG: The implementation matches "available" as a bare substring anywhere in
+    // the sentence, causing false positives for FREE_WINDOW. These two tests expose
+    // that gap and are expected to FAIL until question-parser.ts is updated to use
+    // more precise pattern matching (e.g. requiring scheduling intent context around
+    // the keyword rather than a bare substring match).
+    it("returns OUT_OF_SCOPE for 'I'm not available this weekend'", () => {
+      expect(parseQuestion("I'm not available this weekend")).toBe(
+        QuestionType.OUT_OF_SCOPE
+      );
+    });
+
+    it("returns OUT_OF_SCOPE for 'Let me know when you're available'", () => {
+      expect(parseQuestion("Let me know when you're available")).toBe(
+        QuestionType.OUT_OF_SCOPE
+      );
     });
   });
 });
