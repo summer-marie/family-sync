@@ -50,10 +50,14 @@ test.describe.serial('Shared notes - member (Spec 005)', () => {
     const notesInput = page.getByRole('textbox', { name: /notes/i })
     await notesInput.fill('Remember dentist appointment Tuesday')
 
-    await page.getByRole('button', { name: /save/i }).click()
+    // Wait for the /api/notes response to confirm the note was persisted to
+    // the database before reloading — a fire-and-click race otherwise causes
+    // the reload to happen before the fetch completes.
+    await Promise.all([
+      page.waitForResponse('/api/notes'),
+      page.getByRole('button', { name: /save/i }).click(),
+    ])
 
-    // Reload to confirm the note was persisted to the database, not just
-    // held in component state.
     await page.reload()
 
     await expect(
