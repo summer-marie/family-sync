@@ -73,13 +73,9 @@ test.describe('Shared schedule view', () => {
   test('schedule view renders a section for family members', async ({ page }) => {
     await page.goto('/schedule')
 
-    // Some representation of the member list or per-member availability
-    // blocks must be visible. Accept a labelled list or a schedule grid.
+    // The Family schedule section must be visible as a landmark region.
     await expect(
-      page
-        .getByRole('list', { name: /members|schedule/i })
-        .or(page.getByTestId('schedule-member-list'))
-        .or(page.getByRole('region', { name: /family schedule/i })),
+      page.getByRole('region', { name: /family schedule/i }),
     ).toBeVisible()
   })
 
