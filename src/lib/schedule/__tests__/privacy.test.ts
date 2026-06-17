@@ -60,4 +60,40 @@ describe("applyPrivacyFilter", () => {
     result.title = "mutated";
     expect(fullEvent.title).toBe(original.title);
   });
+
+  // Fail-closed behavior for an unexpected visibility value. The visibility
+  // contract is the strict union "FULL" | "BUSY_ONLY", but defensive coding
+  // requires that any non-"FULL" value (for example a malformed DB row or a
+  // future enum that is not yet recognized) degrades to the privacy-safe Busy
+  // view rather than leaking full event details. This is the privacy-first
+  // rule from AGENTS.md: fail closed for privacy violations.
+  describe("invalid visibility value (fail closed)", () => {
+    it("does not return full details for an unexpected visibility value", () => {
+      const invalid = "PRIVATE" as unknown as "FULL" | "BUSY_ONLY";
+      const result = applyPrivacyFilter(fullEvent, invalid);
+
+      // The private title must NOT be exposed for a non-"FULL" value.
+      expect(result.title).not.toBe("Doctor appointment");
+      // Degrades to the privacy-safe Busy label.
+      expect(result.title).toBe("Busy");
+    });
+
+    it("does not leak the original title for an unexpected visibility value", () => {
+      const invalid = "random-value" as unknown as "FULL" | "BUSY_ONLY";
+      const result = applyPrivacyFilter(fullEvent, invalid);
+
+      expect(JSON.stringify(result)).not.toContain("Doctor appointment");
+      expect(result.title).toBe("Busy");
+    });
+
+    it("still preserves timing for an unexpected visibility value", () => {
+      const invalid = "FULL_HIDDEN" as unknown as "FULL" | "BUSY_ONLY";
+      const result = applyPrivacyFilter(fullEvent, invalid);
+
+      // Privacy-safe Busy output keeps the timing so availability math works.
+      expect(result.start).toBe(fullEvent.start);
+      expect(result.end).toBe(fullEvent.end);
+      expect(result.isAllDay).toBe(fullEvent.isAllDay);
+    });
+  });
 });
