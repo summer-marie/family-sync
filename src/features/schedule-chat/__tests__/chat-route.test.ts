@@ -46,7 +46,7 @@ vi.mock("@/lib/schedule/prompt-builder", () => ({
 
 vi.mock("ai", () => ({
   streamText: vi.fn(() => ({
-    toDataStreamResponse: vi.fn(() => new Response("streamed", { status: 200 })),
+    toTextStreamResponse: vi.fn(() => new Response("streamed", { status: 200 })),
   })),
 }));
 
@@ -98,7 +98,7 @@ beforeEach(() => {
   vi.resetAllMocks();
   getFamilySchedule.mockResolvedValue(mockSchedule);
   streamText.mockReturnValue({
-    toDataStreamResponse: vi.fn(() => new Response("streamed", { status: 200 })),
+    toTextStreamResponse: vi.fn(() => new Response("streamed", { status: 200 })),
   });
 });
 
