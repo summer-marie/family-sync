@@ -25,7 +25,14 @@ export type QuestionType = (typeof QuestionType)[keyof typeof QuestionType];
  * but is asking for an open window, not a single-slot availability check.
  */
 export function parseQuestion(question: string): QuestionType {
-  const q = question.trim().toLowerCase();
+  let q = question.trim().toLowerCase();
+
+  // Normalize common contractions to expanded forms for matching.
+  // This makes the parser more natural-language friendly without
+  // expanding the pattern list.
+  q = q.replace(/who's/g, "who is");
+  q = q.replace(/when's/g, "when is");
+  q = q.replace(/what's/g, "what is");
 
   if (!q) return QuestionType.OUT_OF_SCOPE;
 
@@ -57,9 +64,11 @@ export function parseQuestion(question: string): QuestionType {
   }
 
   // SUMMARIZE_CONFLICTS_DAY: asking what is on the schedule for a day.
-  // "have going on" is required rather than bare "going on" to avoid matching
-  // casual speech like "What's going on?" that has no scheduling intent.
-  if (q.includes("conflicts") || q.includes("have going on")) {
+  // "have going on" and "got going on" are both required rather than bare
+  // "going on" to avoid matching casual speech like "What's going on?"
+  // that has no scheduling intent. "got going on" is the colloquial form
+  // of "have going on" (e.g. "What's everyone got going on?").
+  if (q.includes("conflicts") || q.includes("have going on") || q.includes("got going on")) {
     return QuestionType.SUMMARIZE_CONFLICTS_DAY;
   }
 

@@ -8,6 +8,7 @@ import { test, expect } from './fixtures'
 // - Authenticated user can create a family group
 // - Organizer can invite members by email
 // - Members can view the current member list
+// - Cross-group access restriction: a user cannot view another family's schedule
 //
 // All tests use the pre-authenticated fixture from global-setup, except the
 // unauthenticated redirect test which creates a fresh context.
@@ -80,5 +81,56 @@ test.describe.serial('Family group management', () => {
 
     // The organizer role should be visible
     await expect(page.getByText(/organizer/i)).toBeVisible()
+  })
+})
+
+// ---------------------------------------------------------------------------
+// Cross-group access restriction (RED)
+//
+// A user who is not a member of a family group must not be able to view that
+// group's schedule. The service layer (getFamilySchedule) already enforces
+// this fail-closed rule, but an E2E test verifies the full request/response
+// path: unauthenticated/unauthorized requests result in a 403 or redirect.
+//
+// Implementation note: This test documents the desired behavior. Making it
+// pass requires either:
+// 1. Seeding a second family/user in global-setup and visiting their /schedule
+// 2. Intercepting the API route to simulate a cross-group request
+// ---------------------------------------------------------------------------
+
+test.describe('Cross-group access restriction', () => {
+  test('user cannot view another family group schedule', async ({ page, browser }) => {
+    // Setup: A fresh context representing a user who is NOT a member of the
+    // E2E Test Family. In a real implementation, global-setup would seed
+    // a second family/group and this test would navigate to that schedule.
+    //
+    // For now, the schedule page does not exist, so this test is expected to
+    // fail (RED) until the route exists.
+
+    await page.goto('/schedule')
+
+    // Expected behavior: If the user is not a member of the requested family,
+    // the route should return 403 or redirect (not expose schedule data).
+    //
+    // Placeholder assertion - update once schedule route exists:
+    // await expect(page).toHaveURL(/403|forbidden|not.*member/i)
+
+    // Temporary expectation - will fail until schedule route exists:
+    expect(true).toBe(false)
+  })
+
+  test('member list updates after adding a new member', async ({ page }) => {
+    // After inviting a member (covered by the serial flow above), the members
+    // list should refresh to show the new pending/active member. This tests
+    // that the UI reacts to data changes rather than requiring a full reload.
+
+    await page.goto('/family')
+
+    // Expected: The invited member should appear in the members section
+    // Placeholder - update once invite flow exists:
+    // await expect(page.getByText('invited-member@example.com')).toBeVisible()
+
+    // Temporary expectation - will fail until invite flow exists:
+    expect(true).toBe(false)
   })
 })
