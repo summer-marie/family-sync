@@ -8,6 +8,7 @@ import {
   getFamilySchedule,
 } from "@/features/calendar/services";
 import { updateVisibility } from "@/features/calendar/actions";
+import { ChatWidget } from "@/components/chat/chat-widget";
 import { ConnectCalendarButton } from "@/components/schedule/connect-calendar-button";
 
 // ---------------------------------------------------------------------------
@@ -112,6 +113,8 @@ export default async function SchedulePage() {
             </li>
           </ul>
         </section>
+
+        <ChatWidget />
       </main>
     );
   }
@@ -181,6 +184,8 @@ export default async function SchedulePage() {
           })}
         </ul>
       </section>
+
+      <ChatWidget familyGroupId={familyGroup.id} />
     </main>
   );
 }
