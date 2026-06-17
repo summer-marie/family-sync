@@ -104,6 +104,51 @@ async function globalSetup() {
 
     console.log(`[global-setup] seeded privacy test user: ${privacyUser.email}`)
     console.log('[global-setup] privacy auth state written to e2e/.auth/privacy-user.json')
+
+    // -----------------------------------------------------------------------
+    // Notes test user (e2e-notes@family-sync.test)
+    // Pre-seeded with a family group so shared-notes.spec.ts can target the
+    // notes area directly without conflicting with family-access.spec.ts,
+    // which manages the main test user's family group on the same run.
+    // -----------------------------------------------------------------------
+    const notesUser = await prisma.user.upsert({
+      where: { email: 'e2e-notes@family-sync.test' },
+      update: {},
+      create: { email: 'e2e-notes@family-sync.test', name: 'E2E Notes User' },
+    })
+
+    // Delete any existing family group so state is clean each run.
+    // Cascade deletes GroupMembership and SharedNote.
+    await prisma.familyGroup.deleteMany({
+      where: { memberships: { some: { userId: notesUser.id } } },
+    })
+
+    // Pre-seed the family group with the notes user as ORGANIZER.
+    await prisma.familyGroup.create({
+      data: {
+        name: 'E2E Notes Family',
+        memberships: {
+          create: { userId: notesUser.id, role: 'ORGANIZER' },
+        },
+      },
+    })
+
+    await prisma.session.deleteMany({ where: { userId: notesUser.id } })
+
+    const notesSessionToken = randomUUID()
+    const notesExpires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+
+    await prisma.session.create({
+      data: { sessionToken: notesSessionToken, userId: notesUser.id, expires: notesExpires },
+    })
+
+    fs.writeFileSync(
+      path.join(AUTH_DIR, 'notes-user.json'),
+      JSON.stringify(buildStorageState(notesSessionToken, notesExpires), null, 2),
+    )
+
+    console.log(`[global-setup] seeded notes test user: ${notesUser.email}`)
+    console.log('[global-setup] notes auth state written to e2e/.auth/notes-user.json')
   } finally {
     await prisma.$disconnect()
   }
