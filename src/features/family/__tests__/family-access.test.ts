@@ -112,7 +112,7 @@ const mockInvite = {
   email: "newperson@example.com",
   role: "MEMBER" as const,
   createdAt: new Date("2024-06-03"),
-  expiresAt: new Date("2024-07-03"),
+  expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
 };
 
 beforeEach(() => {
@@ -258,6 +258,12 @@ describe("inviteMember", () => {
   });
 
   it("creates an invite for a valid email when the caller is the organizer", async () => {
+    // Call 1: assertMembership (caller is organizer)
+    // Call 2: existing member check (null = not a member)
+    prisma.groupMembership.findFirst
+      .mockResolvedValueOnce(mockOrganizerMembership)
+      .mockResolvedValueOnce(null);
+
     const result = await inviteMember({
       userId: mockUser.id,
       familyGroupId: "family-1",

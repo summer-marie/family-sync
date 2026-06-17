@@ -193,6 +193,20 @@ export async function inviteMember(input: {
     );
   }
 
+  // Check if the email belongs to someone who is already a member.
+  const existingMember = await prisma.groupMembership.findFirst({
+    where: {
+      familyGroupId: input.familyGroupId,
+      user: { email: input.email },
+    },
+  });
+
+  if (existingMember) {
+    throw new ValidationError(
+      "This email is already a member of the family group.",
+    );
+  }
+
   const invite = await prisma.invite.create({
     data: {
       familyGroupId: input.familyGroupId,
@@ -228,6 +242,11 @@ export async function acceptInvite(input: {
     );
   }
 
+  // Reject if the invite has expired.
+  if (invite.expiresAt < new Date()) {
+    throw new ValidationError("This invite has expired.");
+  }
+
   // Reject if the user already belongs to a group (MVP: one group per user).
   const existingMembership = await prisma.groupMembership.findFirst({
     where: { userId: input.userId },
@@ -257,6 +276,8 @@ export async function acceptInvite(input: {
 
 /**
  * Remove a member from a family group. Only the organizer can remove members.
+ * The organizer cannot remove themselves, as this would leave the group
+ * without an organizer.
  */
 export async function removeMember(input: {
   userId: string;
@@ -264,6 +285,27 @@ export async function removeMember(input: {
   memberUserId: string;
 }): Promise<void> {
   await assertMembership(input.userId, input.familyGroupId, true);
+
+  if (input.userId === input.memberUserId) {
+    throw new ValidationError(
+      "You cannot remove yourself from the family group.",
+    );
+  }
+
+  // Check that the target member exists before attempting deletion so we
+  // throw a clean ValidationError instead of an unhandled Prisma error.
+  const targetMembership = await prisma.groupMembership.findFirst({
+    where: {
+      familyGroupId: input.familyGroupId,
+      userId: input.memberUserId,
+    },
+  });
+
+  if (!targetMembership) {
+    throw new ValidationError(
+      "That user is not a member of this family group.",
+    );
+  }
 
   await prisma.groupMembership.delete({
     where: {
