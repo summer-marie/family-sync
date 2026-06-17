@@ -152,6 +152,15 @@ export async function getFamilyGroupMembers(input: {
   const members = await prisma.groupMembership.findMany({
     where: { familyGroupId: input.familyGroupId },
     orderBy: { createdAt: "asc" },
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+    },
   });
 
   return members;

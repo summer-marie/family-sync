@@ -25,6 +25,12 @@ async function globalSetup() {
       create: { email: TEST_USER_EMAIL, name: TEST_USER_NAME },
     })
 
+    // Clean up any existing family group for the test user so the create
+    // test works on every run. Cascades to memberships and invites.
+    await prisma.familyGroup.deleteMany({
+      where: { memberships: { some: { userId: user.id } } },
+    })
+
     // Replace any stale sessions for this test user
     await prisma.session.deleteMany({ where: { userId: user.id } })
 

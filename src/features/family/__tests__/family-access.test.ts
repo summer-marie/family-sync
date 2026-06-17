@@ -25,7 +25,32 @@ vi.mock("@/lib/prisma", () => ({
   },
 }));
 
-import { prisma } from "@/lib/prisma";
+import { prisma as _prisma } from "@/lib/prisma";
+
+// Cast the mocked prisma client so TypeScript recognizes vi.fn() methods.
+// At runtime, vi.mock("@/lib/prisma") replaces the real client with vi.fn()
+// stubs. This cast aligns the static types with the mock structure.
+const prisma = _prisma as unknown as {
+  familyGroup: {
+    create: ReturnType<typeof vi.fn>;
+    findUnique: ReturnType<typeof vi.fn>;
+    findFirst: ReturnType<typeof vi.fn>;
+  };
+  groupMembership: {
+    create: ReturnType<typeof vi.fn>;
+    findUnique: ReturnType<typeof vi.fn>;
+    findFirst: ReturnType<typeof vi.fn>;
+    findMany: ReturnType<typeof vi.fn>;
+    delete: ReturnType<typeof vi.fn>;
+    count: ReturnType<typeof vi.fn>;
+  };
+  invite: {
+    create: ReturnType<typeof vi.fn>;
+    findFirst: ReturnType<typeof vi.fn>;
+    delete: ReturnType<typeof vi.fn>;
+  };
+};
+
 import {
   createFamilyGroup,
   getMyFamilyGroup,
