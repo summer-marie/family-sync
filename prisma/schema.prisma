@@ -15,6 +15,7 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
+  memberships   GroupMembership[]
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }
@@ -53,4 +54,89 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+// ---------------------------------------------------------------------------
+// Family group and membership (Step 2 - spec 003)
+//
+// MVP rules:
+// - A user can belong to at most one family group, enforced at the DB level
+//   by the @@unique([userId]) constraint on GroupMembership below.
+// - Family ownership and access control come from persisted membership
+//   records only. Invite codes/emails are onboarding helpers, not the source
+//   of truth.
+//
+// v2 upgrade notes:
+// - To allow a user to join multiple family groups, drop the
+//   @@unique([userId]) constraint on GroupMembership. Keep the composite
+//   unique [familyGroupId, userId] so membership remains explicit.
+// - The session may then need to carry a selected familyId, and auth
+//   callbacks would need updating. That is a protected-area change requiring
+//   explicit confirmation per AGENTS.md.
+// ---------------------------------------------------------------------------
+
+model FamilyGroup {
+  id          String           @id @default(cuid())
+  name        String
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  memberships GroupMembership[]
+  invites     Invite[]
+
+  @@map("family_group")
+}
+
+model GroupMembership {
+  id            String     @id @default(cuid())
+  familyGroupId String
+  userId        String
+  role          Role       @default(MEMBER)
+  createdAt     DateTime   @default(now())
+
+  familyGroup FamilyGroup @relation(fields: [familyGroupId], references: [id], onDelete: Cascade)
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Composite unique: a user can be a member of a given group at most once.
+  @@unique([familyGroupId, userId])
+
+  // MVP-only: enforce one family group per user. See v2 upgrade notes above.
+  @@unique([userId])
+
+  @@map("group_membership")
+}
+
+enum Role {
+  ORGANIZER
+  MEMBER
+}
+
+// ---------------------------------------------------------------------------
+// Lightweight invite helper (Step 2 - spec 003)
+//
+// MVP scope:
+// - Email-based invites with expiry.
+// - Membership is created only when an invited user accepts; invites are not
+//   the source of truth for access.
+// - Duplicate invites for the same email within a group are rejected via the
+//   @@unique([familyGroupId, email]) constraint.
+//
+// v2 upgrade notes:
+// - Add a status enum (PENDING, ACCEPTED, REVOKED) instead of deleting on
+//   acceptance.
+// - Add optional code-based joins alongside email invites.
+// ---------------------------------------------------------------------------
+
+model Invite {
+  id            String     @id @default(cuid())
+  familyGroupId String
+  email         String
+  role          Role       @default(MEMBER)
+  createdAt     DateTime   @default(now())
+  expiresAt     DateTime
+
+  familyGroup FamilyGroup @relation(fields: [familyGroupId], references: [id], onDelete: Cascade)
+
+  @@unique([familyGroupId, email])
+
+  @@map("invite")
 }

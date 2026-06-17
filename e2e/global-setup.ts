@@ -1,4 +1,5 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from '../src/generated/prisma/client'
+import { PrismaPg } from '@prisma/adapter-pg'
 import dotenv from 'dotenv'
 import fs from 'fs'
 import path from 'path'
@@ -13,13 +14,21 @@ const TEST_USER_NAME = 'E2E Test User'
 const AUTH_DIR = path.join(process.cwd(), 'e2e', '.auth')
 
 async function globalSetup() {
-  const prisma = new PrismaClient()
+  const prisma = new PrismaClient({
+    adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL! }),
+  })
 
   try {
     const user = await prisma.user.upsert({
       where: { email: TEST_USER_EMAIL },
       update: {},
       create: { email: TEST_USER_EMAIL, name: TEST_USER_NAME },
+    })
+
+    // Clean up any existing family group for the test user so the create
+    // test works on every run. Cascades to memberships and invites.
+    await prisma.familyGroup.deleteMany({
+      where: { memberships: { some: { userId: user.id } } },
     })
 
     // Replace any stale sessions for this test user
