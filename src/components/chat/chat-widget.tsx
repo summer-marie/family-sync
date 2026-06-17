@@ -25,6 +25,11 @@ export function ChatWidget({ familyGroupId }: Props) {
         body: JSON.stringify({ question, familyGroupId }),
       });
 
+      if (!res.ok) {
+        setResponse("Something went wrong. Please try again.");
+        return;
+      }
+
       const contentType = res.headers.get("content-type") ?? "";
 
       if (contentType.includes("application/json")) {

@@ -37,15 +37,15 @@ export async function POST(req: Request): Promise<Response> {
     return new Response("Bad Request: question is required", { status: 400 });
   }
 
+  // Step 3: reject out-of-scope questions before touching family/calendar data
+  if (parseQuestion(question) === QuestionType.OUT_OF_SCOPE) {
+    return Response.json({ message: OUT_OF_SCOPE_MESSAGE });
+  }
+
   if (!familyGroupId) {
     return new Response("Bad Request: familyGroupId is required", {
       status: 400,
     });
-  }
-
-  // Step 3: reject out-of-scope questions before hitting Google or the model
-  if (parseQuestion(question) === QuestionType.OUT_OF_SCOPE) {
-    return Response.json({ message: OUT_OF_SCOPE_MESSAGE });
   }
 
   // Step 4: load authorized, privacy-filtered schedule data
