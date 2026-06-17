@@ -1,14 +1,11 @@
 import { auth } from "@/auth";
 import { streamText } from "ai";
-import { anthropic } from "@ai-sdk/anthropic";
+import { openai } from "@ai-sdk/openai";
 import {
   getFamilySchedule,
   AuthorizationError,
 } from "@/features/calendar/services";
-import {
-  parseQuestion,
-  QuestionType,
-} from "@/lib/schedule/question-parser";
+import { parseQuestion, QuestionType } from "@/lib/schedule/question-parser";
 import { buildChatMessages } from "@/lib/schedule/prompt-builder";
 
 const OUT_OF_SCOPE_MESSAGE =
@@ -74,10 +71,9 @@ export async function POST(req: Request): Promise<Response> {
   const messages = buildChatMessages(question, schedule);
 
   const result = streamText({
-    model: anthropic("claude-haiku-4-5-20251001"),
+    model: openai("gpt-4o-mini"),
     messages,
-    maxTokens: 512,
   });
 
-  return result.toDataStreamResponse();
+  return result.toTextStreamResponse();
 }
