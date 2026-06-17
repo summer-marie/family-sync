@@ -53,4 +53,11 @@ describe("applyPrivacyFilter", () => {
     applyPrivacyFilter(fullEvent, "BUSY_ONLY");
     expect(fullEvent.title).toBe(original.title);
   });
+
+  it("does not mutate the original event object when visibility is FULL", () => {
+    const original = { ...fullEvent };
+    const result = applyPrivacyFilter(fullEvent, "FULL");
+    result.title = "mutated";
+    expect(fullEvent.title).toBe(original.title);
+  });
 });

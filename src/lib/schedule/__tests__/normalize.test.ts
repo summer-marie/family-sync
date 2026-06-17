@@ -49,6 +49,20 @@ describe("normalizeEvents", () => {
     expect(result[0].title).toBe("(no title)");
   });
 
+  it("falls back to '(no title)' when summary is null", () => {
+    const result = normalizeEvents([makeEvent({ summary: null })]);
+    expect(result[0].title).toBe("(no title)");
+  });
+
+  it("prefers dateTime over date when both are present on the start block", () => {
+    const dateTime = "2024-06-10T09:00:00-07:00";
+    const result = normalizeEvents([
+      makeEvent({ start: { dateTime, date: "2024-06-10" } }),
+    ]);
+    expect(result[0].start).toBe(dateTime);
+    expect(result[0].isAllDay).toBe(false);
+  });
+
   it("normalizes multiple events in order", () => {
     const events = [
       makeEvent({ id: "a", summary: "First" }),
@@ -57,5 +71,41 @@ describe("normalizeEvents", () => {
     const result = normalizeEvents(events);
     expect(result[0].title).toBe("First");
     expect(result[1].title).toBe("Second");
+  });
+
+  describe("skip path — events with unusable timing data", () => {
+    it("skips an event with no start field", () => {
+      const result = normalizeEvents([makeEvent({ start: undefined })]);
+      expect(result).toHaveLength(0);
+    });
+
+    it("skips an event with no end field", () => {
+      const result = normalizeEvents([makeEvent({ end: undefined })]);
+      expect(result).toHaveLength(0);
+    });
+
+    it("skips an event where start.dateTime and start.date are both null", () => {
+      const result = normalizeEvents([
+        makeEvent({ start: { dateTime: null, date: null } }),
+      ]);
+      expect(result).toHaveLength(0);
+    });
+
+    it("skips an event where end.dateTime and end.date are both null", () => {
+      const result = normalizeEvents([
+        makeEvent({ end: { dateTime: null, date: null } }),
+      ]);
+      expect(result).toHaveLength(0);
+    });
+
+    it("returns only the valid event from a mixed array where one has no end", () => {
+      const events = [
+        makeEvent({ id: "a", summary: "Valid event" }),
+        makeEvent({ id: "b", summary: "No end event", end: undefined }),
+      ];
+      const result = normalizeEvents(events);
+      expect(result).toHaveLength(1);
+      expect(result[0].title).toBe("Valid event");
+    });
   });
 });
