@@ -473,10 +473,10 @@ Update these as you go. Add a short note when something blocks a step.
 
 ### Step 6 - Shared Notes (spec 005)
 - [x] Confirm `SharedNote` model
-- [ ] Migration applied
+- [x] Migration applied (20260617184219_add_shared_note)
 - [x] Write failing integration tests
 - [x] Capture `13-shared-notes-red.txt`
-- [ ] Implement to green
+- [x] Implement to green
 - [ ] Write failing E2E tests
 - [ ] Capture `13-shared-notes-e2e-red.txt`
 - [ ] Implement to green

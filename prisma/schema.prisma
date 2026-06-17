@@ -13,10 +13,11 @@ model User {
   email         String    @unique
   emailVerified DateTime?
   image         String?
-  accounts           Account[]
-  sessions           Session[]
-  memberships        GroupMembership[]
+  accounts            Account[]
+  sessions            Session[]
+  memberships         GroupMembership[]
   calendarConnections CalendarConnection[]
+  sharedNoteUpdates   SharedNote[]
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }
@@ -83,6 +84,7 @@ model FamilyGroup {
   updatedAt   DateTime         @updatedAt
   memberships GroupMembership[]
   invites     Invite[]
+  sharedNote  SharedNote?
 
   @@map("family_group")
 }
@@ -192,4 +194,29 @@ enum ConnectionStatus {
 enum Visibility {
   FULL
   BUSY_ONLY
+}
+
+// ---------------------------------------------------------------------------
+// Shared family note (Step 6 - spec 005)
+//
+// MVP rules:
+// - One note per family group, enforced at the DB level by @unique on
+//   familyGroupId.
+// - Content defaults to empty string; an empty note is valid.
+// - updatedByUserId tracks the last editor. No history is stored for MVP.
+// - onDelete: Cascade on the family group relation: deleting the group also
+//   deletes the note.
+// ---------------------------------------------------------------------------
+
+model SharedNote {
+  id              String   @id @default(cuid())
+  familyGroupId   String   @unique
+  content         String   @default("")
+  updatedAt       DateTime @updatedAt
+  updatedByUserId String
+
+  familyGroup FamilyGroup @relation(fields: [familyGroupId], references: [id], onDelete: Cascade)
+  updatedBy   User        @relation(fields: [updatedByUserId], references: [id])
+
+  @@map("shared_note")
 }
