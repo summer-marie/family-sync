@@ -105,5 +105,12 @@ describe("parseQuestion", () => {
         QuestionType.OUT_OF_SCOPE
       );
     });
+
+    // BUG: The bare "going on" substring matches casual speech that is not a
+    // scheduling request. Expected to FAIL until question-parser.ts is tightened
+    // to require scheduling-specific context around the phrase.
+    it("returns OUT_OF_SCOPE for 'What's going on?'", () => {
+      expect(parseQuestion("What's going on?")).toBe(QuestionType.OUT_OF_SCOPE);
+    });
   });
 });
