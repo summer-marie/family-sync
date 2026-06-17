@@ -30,10 +30,13 @@ export function parseQuestion(question: string): QuestionType {
   if (!q) return QuestionType.OUT_OF_SCOPE;
 
   // FREE_WINDOW: asking to find an open window across the family.
+  // "available" is intentionally matched only with a collective subject to avoid
+  // false positives from casual sentences like "I'm not available this weekend".
   if (
     q.includes("when is everyone free") ||
     q.includes("find a time") ||
-    q.includes("available")
+    q.includes("all available") ||
+    q.includes("everyone available")
   ) {
     return QuestionType.FREE_WINDOW;
   }
@@ -54,7 +57,9 @@ export function parseQuestion(question: string): QuestionType {
   }
 
   // SUMMARIZE_CONFLICTS_DAY: asking what is on the schedule for a day.
-  if (q.includes("conflicts") || q.includes("going on")) {
+  // "have going on" is required rather than bare "going on" to avoid matching
+  // casual speech like "What's going on?" that has no scheduling intent.
+  if (q.includes("conflicts") || q.includes("have going on")) {
     return QuestionType.SUMMARIZE_CONFLICTS_DAY;
   }
 

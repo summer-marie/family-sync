@@ -49,6 +49,20 @@ describe("normalizeEvents", () => {
     expect(result[0].title).toBe("(no title)");
   });
 
+  it("falls back to '(no title)' when summary is null", () => {
+    const result = normalizeEvents([makeEvent({ summary: null })]);
+    expect(result[0].title).toBe("(no title)");
+  });
+
+  it("prefers dateTime over date when both are present on the start block", () => {
+    const dateTime = "2024-06-10T09:00:00-07:00";
+    const result = normalizeEvents([
+      makeEvent({ start: { dateTime, date: "2024-06-10" } }),
+    ]);
+    expect(result[0].start).toBe(dateTime);
+    expect(result[0].isAllDay).toBe(false);
+  });
+
   it("normalizes multiple events in order", () => {
     const events = [
       makeEvent({ id: "a", summary: "First" }),
