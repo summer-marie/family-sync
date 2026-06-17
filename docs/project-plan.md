@@ -203,6 +203,19 @@ This feature would allow a few tightly controlled AI-supported actions later, bu
 - Key data: requested action, confirmation state, allowed action list.
 - Edge cases: ambiguous commands, unauthorized actions, accidental changes.
 
+## Development Progress
+
+| Step | Feature | Spec | Status |
+|------|---------|------|--------|
+| 1 | Schedule and event normalization | — | COMPLETE |
+| 2 | Privacy filter | — | COMPLETE |
+| 3 | Question parser | — | COMPLETE |
+| 4 | Auth and family access | 003 | COMPLETE |
+| 5 | Calendar connection and shared schedule | 002 | COMPLETE |
+| 5a | Privacy and visibility controls | 004 | COMPLETE |
+| 5b | AI schedule chat | 001 | COMPLETE |
+| 6 | Shared family notes | 005 | COMPLETE |
+
 ## Open Questions / Unknowns
 
 - Final SQL database choice and hosting approach.

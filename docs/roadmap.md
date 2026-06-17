@@ -472,13 +472,13 @@ Update these as you go. Add a short note when something blocks a step.
 - [ ] Implement chat UI to green
 
 ### Step 6 - Shared Notes (spec 005)
-- [ ] Confirm `SharedNote` model
-- [ ] Migration applied
-- [ ] Write failing integration tests
-- [ ] Capture `08-shared-notes-red.txt`
-- [ ] Implement to green
+- [x] Confirm `SharedNote` model
+- [x] Migration applied (20260617184219_add_shared_note)
+- [x] Write failing integration tests
+- [x] Capture `13-shared-notes-red.txt`
+- [x] Implement to green
 - [ ] Write failing E2E tests
-- [ ] Capture `08-shared-notes-e2e-red.txt`
+- [ ] Capture `13-shared-notes-e2e-red.txt`
 - [ ] Implement to green
 
 ### Issues and notes

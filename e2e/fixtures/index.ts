@@ -28,4 +28,19 @@ export const privacyTest = base.extend({
   },
 })
 
+// Notes test user — pre-seeded with a family group (E2E Notes Family) by
+// global-setup.ts on each run. Used by shared-notes.spec.ts so those tests
+// can target the notes area without conflicting with family-access.spec.ts,
+// which manages the main test user's family group separately.
+export const notesTest = base.extend({
+  page: async ({ browser }, use) => {
+    const context = await browser.newContext({
+      storageState: path.join(process.cwd(), 'e2e', '.auth', 'notes-user.json'),
+    })
+    const page = await context.newPage()
+    await use(page)
+    await context.close()
+  },
+})
+
 export { expect }
