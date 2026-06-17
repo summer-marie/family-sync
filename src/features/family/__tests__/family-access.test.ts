@@ -91,7 +91,9 @@ const mockInvite = {
 };
 
 beforeEach(() => {
-  vi.clearAllMocks();
+  // resetAllMocks clears both call history AND implementations so
+  // no state leaks between tests (clearAllMocks only clears history).
+  vi.resetAllMocks();
 });
 
 // ---------------------------------------------------------------------------
