@@ -339,6 +339,23 @@ describe("inviteMember", () => {
 
     expect(prisma.invite.create).not.toHaveBeenCalled();
   });
+
+  it("rejects inviting an email that is already a group member", async () => {
+    // Second findFirst call checks for existing membership by email
+    prisma.groupMembership.findFirst
+      .mockResolvedValueOnce(mockOrganizerMembership) // caller auth check
+      .mockResolvedValueOnce(mockMemberMembership); // existing member check
+
+    await expect(
+      inviteMember({
+        userId: mockUser.id,
+        familyGroupId: "family-1",
+        email: "member@example.com",
+      }),
+    ).rejects.toThrow(ValidationError);
+
+    expect(prisma.invite.create).not.toHaveBeenCalled();
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -395,6 +412,24 @@ describe("acceptInvite", () => {
 
     expect(prisma.groupMembership.create).not.toHaveBeenCalled();
   });
+
+  it("rejects acceptance when the invite has expired", async () => {
+    const expiredInvite = {
+      ...mockInvite,
+      expiresAt: new Date("2020-01-01"), // in the past
+    };
+    prisma.invite.findFirst.mockResolvedValue(expiredInvite);
+    prisma.groupMembership.findFirst.mockResolvedValue(null);
+
+    await expect(
+      acceptInvite({
+        userId: mockOtherUser.id,
+        email: "newperson@example.com",
+      }),
+    ).rejects.toThrow(ValidationError);
+
+    expect(prisma.groupMembership.create).not.toHaveBeenCalled();
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -407,6 +442,11 @@ describe("removeMember", () => {
   });
 
   it("removes a member when requested by the organizer", async () => {
+    // First findFirst: assertMembership (caller is organizer)
+    // Second findFirst: target member exists
+    prisma.groupMembership.findFirst
+      .mockResolvedValueOnce(mockOrganizerMembership)
+      .mockResolvedValueOnce(mockMemberMembership);
     prisma.groupMembership.delete.mockResolvedValue(mockMemberMembership);
 
     await removeMember({
@@ -451,6 +491,39 @@ describe("removeMember", () => {
         memberUserId: "user-3",
       }),
     ).rejects.toThrow(AuthorizationError);
+
+    expect(prisma.groupMembership.delete).not.toHaveBeenCalled();
+  });
+
+  it("rejects when the organizer tries to remove themselves", async () => {
+    // assertMembership passes, then the self-removal guard throws
+    prisma.groupMembership.findFirst.mockResolvedValue(mockOrganizerMembership);
+
+    await expect(
+      removeMember({
+        userId: mockUser.id,
+        familyGroupId: "family-1",
+        memberUserId: mockUser.id,
+      }),
+    ).rejects.toThrow(ValidationError);
+
+    expect(prisma.groupMembership.delete).not.toHaveBeenCalled();
+  });
+
+  it("rejects when the target member does not exist in the group", async () => {
+    // First findFirst: assertMembership (caller is organizer) - passes
+    // Second findFirst: target member exists check - returns null
+    prisma.groupMembership.findFirst
+      .mockResolvedValueOnce(mockOrganizerMembership)
+      .mockResolvedValueOnce(null);
+
+    await expect(
+      removeMember({
+        userId: mockUser.id,
+        familyGroupId: "family-1",
+        memberUserId: "nonexistent-user",
+      }),
+    ).rejects.toThrow(ValidationError);
 
     expect(prisma.groupMembership.delete).not.toHaveBeenCalled();
   });
