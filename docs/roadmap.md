@@ -444,14 +444,14 @@ Update these as you go. Add a short note when something blocks a step.
 - [x] Implement to green
 
 ### Step 3 - Calendar Connection (spec 002)
-- [ ] Confirm schema proposal
-- [ ] Migration applied
-- [ ] Write failing integration tests
-- [ ] Capture `05-calendar-connection-red.txt`
-- [ ] Implement to green
-- [ ] Write failing E2E tests
-- [ ] Capture `05-calendar-connection-e2e-red.txt`
-- [ ] Implement to green
+- [x] Confirm schema proposal
+- [x] Migration applied
+- [x] Write failing integration tests
+- [x] Capture `05-calendar-connection-red.txt`
+- [x] Implement to green
+- [x] Write failing E2E tests
+- [x] Capture `05-calendar-connection-e2e-red.txt`
+- [x] Implement to green
 
 ### Step 4 - Privacy Controls (spec 004)
 - [ ] Confirm visibility field on `CalendarConnection`

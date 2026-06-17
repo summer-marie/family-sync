@@ -2,7 +2,7 @@ import type { ScheduleEvent } from "./privacy";
 
 // Subset of the Google Calendar API event shape relevant to normalization.
 type GoogleCalendarEvent = {
-  id?: string;
+  id?: string | null;
   summary?: string | null;
   start?: {
     dateTime?: string | null;

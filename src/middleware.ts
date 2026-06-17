@@ -14,7 +14,7 @@ import type { NextRequest } from "next/server";
 
 const SESSION_COOKIE = "authjs.session-token";
 
-const PROTECTED_PREFIXES = ["/family"];
+const PROTECTED_PREFIXES = ["/family", "/schedule"];
 
 export function middleware(req: NextRequest) {
   const { nextUrl } = req;
@@ -35,5 +35,5 @@ export function middleware(req: NextRequest) {
 
 export const config = {
   // Only run middleware on protected prefixes for efficiency
-  matcher: ["/family/:path*"],
+  matcher: ["/family/:path*", "/schedule/:path*", "/schedule"],
 };
