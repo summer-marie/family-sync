@@ -10,6 +10,7 @@ export function ChatWidget({ familyGroupId }: Props) {
   const [question, setQuestion] = useState("");
   const [response, setResponse] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -17,6 +18,7 @@ export function ChatWidget({ familyGroupId }: Props) {
 
     setLoading(true);
     setResponse("");
+    setIsError(false);
 
     try {
       const res = await fetch("/api/chat", {
@@ -26,6 +28,7 @@ export function ChatWidget({ familyGroupId }: Props) {
       });
 
       if (!res.ok) {
+        setIsError(true);
         setResponse("Something went wrong. Please try again.");
         return;
       }
@@ -60,6 +63,7 @@ export function ChatWidget({ familyGroupId }: Props) {
         }
       }
     } catch {
+      setIsError(true);
       setResponse("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
@@ -76,7 +80,7 @@ export function ChatWidget({ familyGroupId }: Props) {
           onChange={(e) => setQuestion(e.target.value)}
           placeholder="Ask a question about the schedule"
           disabled={loading}
-          className="flex-1 rounded border px-3 py-1.5 text-sm"
+          className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400 disabled:bg-gray-100 disabled:text-gray-400"
         />
         <button
           type="submit"
@@ -87,11 +91,21 @@ export function ChatWidget({ familyGroupId }: Props) {
         </button>
       </form>
 
+      {loading && !response && (
+        <div className="mt-4 rounded-lg border border-gray-200 bg-white p-3">
+          <span className="animate-pulse text-sm text-gray-400">Thinking...</span>
+        </div>
+      )}
+
       {response && (
         <div
           role="region"
           aria-label="Chat response"
-          className="mt-3 text-sm text-gray-700"
+          className={
+            isError
+              ? "mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700"
+              : "mt-4 rounded-lg border border-gray-200 bg-white p-3 text-sm text-gray-700"
+          }
         >
           {response}
         </div>
