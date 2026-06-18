@@ -28,12 +28,16 @@ export function NotesForm({ familyGroupId, initialContent }: NotesFormProps) {
         value={content}
         onChange={(e) => setContent(e.target.value)}
         rows={6}
-        className="w-full rounded-lg border border-gray-300 p-3 text-sm focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+        className="w-full rounded-lg p-3 text-sm text-primary placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-amber/40"
+        style={{
+          backgroundColor: "#2a2520",
+          border: "1px solid rgba(255, 220, 160, 0.10)",
+        }}
       />
       <button
         onClick={handleSave}
         disabled={saving}
-        className="mt-2 rounded bg-blue-600 px-4 py-2 text-sm text-white disabled:opacity-50"
+        className="mt-2 rounded-lg bg-amber px-4 py-2 text-sm font-medium text-canvas hover:bg-amber-hover disabled:opacity-50"
       >
         {saving ? "Saving..." : "Save"}
       </button>

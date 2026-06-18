@@ -31,87 +31,144 @@ export default async function FamilyPage() {
 
   const familyGroup = await getMyFamilyGroup(userId);
 
-  // State 1: no family group yet - show the creation form
+  // State 1: no family group yet — show creation form
   if (!familyGroup) {
     return (
       <main className="mx-auto max-w-2xl px-4 py-8">
-        <h1 className="mb-6 text-2xl font-bold">Set up your family</h1>
+        <h1 className="mb-6 text-2xl font-bold text-primary md:text-3xl">
+          Set up your family
+        </h1>
         <CreateFamilyForm />
       </main>
     );
   }
 
-  // State 2: has a family group - show the dashboard
+  // State 2: has a family group
   const members = await getFamilyGroupMembers({
     userId,
     familyGroupId: familyGroup.id,
   });
 
-  // Load pending invites for this group
   const invites = await prisma.invite.findMany({
     where: { familyGroupId: familyGroup.id },
     orderBy: { createdAt: "asc" },
   });
 
-  // Load the shared note for this group (null if none created yet)
   const sharedNote = await prisma.sharedNote.findUnique({
     where: { familyGroupId: familyGroup.id },
   });
 
-  // Check if the current user is the organizer
   const currentMember = members.find((m) => m.userId === userId);
   const isOrganizer = currentMember?.role === "ORGANIZER";
 
   return (
     <main className="mx-auto max-w-2xl px-4 py-8">
-      <h1 className="mb-2 text-2xl font-bold">{familyGroup.name}</h1>
+      <h1 className="mb-6 text-2xl font-bold text-primary md:text-3xl">
+        {familyGroup.name}
+      </h1>
 
       {/* Members section */}
       <section className="mb-8">
-        <h2 className="mb-3 text-lg font-semibold">Members</h2>
-        <ul className="space-y-2">
-          {members.map((member) => (
-            <li
-              key={member.id}
-              className="flex items-center justify-between rounded-lg border border-gray-200 bg-white p-3 shadow-sm"
-            >
-              <div className="flex min-w-0 items-center gap-2">
-                <span className="truncate font-medium">
-                  {member.user.name ?? member.user.email}
-                </span>
-                <span
-                  className={
-                    member.role === "ORGANIZER"
-                      ? "inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700"
-                      : "inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600"
-                  }
-                >
-                  {member.role.toLowerCase()}
-                </span>
-              </div>
-              {isOrganizer && member.userId !== userId && (
-                <RemoveMemberButton
-                  familyGroupId={familyGroup.id}
-                  memberUserId={member.userId}
-                />
-              )}
-            </li>
-          ))}
+        <h2 className="mb-3 text-lg font-semibold text-primary">Members</h2>
+        <ul
+          className="overflow-hidden rounded-[10px]"
+          style={{
+            backgroundColor: "#1e1b16",
+            border: "1px solid rgba(255, 220, 160, 0.10)",
+          }}
+        >
+          {members.map((member, index) => {
+            const displayName = member.user.name ?? member.user.email ?? "?";
+            const initial = displayName[0].toUpperCase();
+            const isOrganiserRow = member.role === "ORGANIZER";
+
+            return (
+              <li
+                key={member.id}
+                className="flex min-h-14 items-center justify-between px-4 py-4 transition-colors hover:bg-row"
+                style={
+                  index < members.length - 1
+                    ? { borderBottom: "1px solid rgba(255, 220, 160, 0.08)" }
+                    : undefined
+                }
+              >
+                <div className="flex min-w-0 items-center gap-3">
+                  {/* Avatar circle */}
+                  <div
+                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-amber"
+                    style={{ backgroundColor: "#332e27" }}
+                  >
+                    {initial}
+                  </div>
+
+                  <span className="truncate font-medium text-primary">
+                    {displayName}
+                  </span>
+
+                  {/* Role badge */}
+                  {isOrganiserRow ? (
+                    <span
+                      className="shrink-0 rounded-sm px-2 py-0.5 text-xs font-medium uppercase tracking-wide"
+                      style={{
+                        backgroundColor: "rgba(212, 168, 83, 0.20)",
+                        color: "#d4a853",
+                      }}
+                    >
+                      organizer
+                    </span>
+                  ) : (
+                    <span className="shrink-0 rounded-sm bg-row px-2 py-0.5 text-xs font-medium text-muted">
+                      member
+                    </span>
+                  )}
+                </div>
+
+                {isOrganizer && member.userId !== userId && (
+                  <RemoveMemberButton
+                    familyGroupId={familyGroup.id}
+                    memberUserId={member.userId}
+                  />
+                )}
+              </li>
+            );
+          })}
         </ul>
       </section>
 
       {/* Pending invites section */}
       {invites.length > 0 && (
         <section className="mb-8">
-          <h2 className="mb-3 text-lg font-semibold">Pending Invites</h2>
-          <ul className="space-y-2">
-            {invites.map((invite) => (
+          <h2 className="mb-3 text-lg font-semibold text-primary">
+            Pending Invites
+          </h2>
+          <ul
+            className="overflow-hidden rounded-[10px]"
+            style={{
+              backgroundColor: "#1e1b16",
+              border: "1px solid rgba(255, 220, 160, 0.10)",
+            }}
+          >
+            {invites.map((invite, index) => (
               <li
                 key={invite.id}
-                className="flex items-center justify-between rounded-lg border border-dashed border-amber-200 bg-amber-50 p-3"
+                className="flex items-center justify-between px-4 py-4"
+                style={
+                  index < invites.length - 1
+                    ? { borderBottom: "1px solid rgba(255, 220, 160, 0.08)" }
+                    : undefined
+                }
               >
-                <span className="min-w-0 truncate text-sm">{invite.email}</span>
-                <span className="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">
+                <span className="min-w-0 truncate text-sm text-secondary">
+                  {invite.email}
+                </span>
+                <span
+                  className="ml-3 shrink-0 rounded-sm px-2 py-0.5 text-xs font-medium"
+                  style={{
+                    backgroundColor: "#332e27",
+                    color: "#d4a853",
+                    border: "1px solid rgba(212, 168, 83, 0.20)",
+                  }}
+                >
                   pending
                 </span>
               </li>
@@ -120,17 +177,24 @@ export default async function FamilyPage() {
         </section>
       )}
 
-      {/* Invite form (organizer only) */}
+      {/* Invite form — organizer only */}
       {isOrganizer && (
         <section className="mb-8">
-          <h2 className="mb-3 text-lg font-semibold">Invite a member</h2>
+          <h2 className="mb-3 text-lg font-semibold text-primary">
+            Invite a member
+          </h2>
           <InviteForm familyGroupId={familyGroup.id} />
         </section>
       )}
 
       {/* Shared notes */}
-      <section className="border-t border-gray-200 pt-8">
-        <h2 className="mb-3 text-lg font-semibold">Family Notes</h2>
+      <section
+        className="pt-8"
+        style={{ borderTop: "1px solid rgba(255, 220, 160, 0.10)" }}
+      >
+        <h2 className="mb-3 text-lg font-semibold text-primary">
+          Family Notes
+        </h2>
         <NotesForm
           familyGroupId={familyGroup.id}
           initialContent={sharedNote?.content ?? ""}

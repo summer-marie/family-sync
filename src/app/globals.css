@@ -1,2 +1,34 @@
 @import "tailwindcss";
 
+@theme {
+  /* Background layers — deepest to lightest */
+  --color-sidebar: #100e0b;
+  --color-canvas: #13110e;
+  --color-card: #1e1b16;
+  --color-row: #2a2520;
+  --color-subtle: #332e27;
+
+  /* Text */
+  --color-primary: #f0ebe4;
+  --color-secondary: #c8bfb0;
+  --color-muted: #8a7f72;
+
+  /* Amber / gold accent */
+  --color-amber: #d4a853;
+  --color-amber-hover: #e8c97a;
+  --color-amber-dark: #b8832a;
+
+  /* Purple — AI chat panel only */
+  --color-ai: #7c5cbf;
+  --color-ai-hover: #9370d8;
+
+  /* Destructive */
+  --color-danger: #c0392b;
+}
+
+@layer base {
+  body {
+    background-color: #13110e;
+    color: #f0ebe4;
+  }
+}

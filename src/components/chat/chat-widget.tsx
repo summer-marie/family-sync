@@ -12,7 +12,7 @@ export function ChatWidget({ familyGroupId }: Props) {
   const [loading, setLoading] = useState(false);
   const [isError, setIsError] = useState(false);
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: { preventDefault(): void }) {
     e.preventDefault();
     if (!question.trim() || loading) return;
 
@@ -71,8 +71,18 @@ export function ChatWidget({ familyGroupId }: Props) {
   }
 
   return (
-    <section aria-label="AI Schedule Chat" className="mt-10 rounded-lg border-2 border-gray-200 bg-gray-50 p-5">
-      <h2 className="mb-4 text-base font-semibold">Ask about the schedule</h2>
+    <section
+      aria-label="AI Schedule Chat"
+      className="mt-10 rounded-[10px] p-6"
+      style={{
+        background:
+          "linear-gradient(135deg, #1e1510 0%, #1a1520 50%, #141020 100%)",
+        border: "1px solid rgba(124, 92, 191, 0.30)",
+      }}
+    >
+      <h2 className="mb-4 text-base font-semibold text-primary">
+        Ask about the schedule
+      </h2>
       <form onSubmit={handleSubmit} className="flex gap-2">
         <input
           type="text"
@@ -80,20 +90,30 @@ export function ChatWidget({ familyGroupId }: Props) {
           onChange={(e) => setQuestion(e.target.value)}
           placeholder="Ask a question about the schedule"
           disabled={loading}
-          className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400 disabled:bg-gray-100 disabled:text-gray-400"
+          className="flex-1 rounded-lg px-3 py-2 text-sm text-primary placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-ai/60 disabled:opacity-50"
+          style={{
+            backgroundColor: "#1e1b16",
+            border: "1px solid rgba(124, 92, 191, 0.30)",
+          }}
         />
         <button
           type="submit"
           disabled={loading || !question.trim()}
-          className="rounded bg-gray-800 px-3 py-2 text-sm text-white disabled:opacity-50"
+          className="rounded-lg bg-ai px-4 py-2 text-sm font-medium text-white hover:bg-ai-hover disabled:opacity-50"
         >
           {loading ? "Asking…" : "Ask"}
         </button>
       </form>
 
       {loading && !response && (
-        <div className="mt-4 rounded-lg border border-gray-200 bg-white p-3">
-          <span className="animate-pulse text-sm text-gray-400">Thinking...</span>
+        <div
+          className="mt-4 rounded-[10px] p-3"
+          style={{
+            backgroundColor: "#1e1b16",
+            border: "1px solid rgba(255, 220, 160, 0.08)",
+          }}
+        >
+          <span className="animate-pulse text-sm text-muted">Thinking...</span>
         </div>
       )}
 
@@ -101,10 +121,19 @@ export function ChatWidget({ familyGroupId }: Props) {
         <div
           role="region"
           aria-label="Chat response"
-          className={
+          className="mt-4 rounded-[10px] p-3 text-sm"
+          style={
             isError
-              ? "mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700"
-              : "mt-4 rounded-lg border border-gray-200 bg-white p-3 text-sm text-gray-700"
+              ? {
+                  backgroundColor: "#1e1b16",
+                  border: "1px solid rgba(192, 57, 43, 0.30)",
+                  color: "#c0392b",
+                }
+              : {
+                  backgroundColor: "#1e1b16",
+                  border: "1px solid rgba(255, 220, 160, 0.08)",
+                  color: "#c8bfb0",
+                }
           }
         >
           {response}
