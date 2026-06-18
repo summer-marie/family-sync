@@ -198,7 +198,7 @@ export default async function SchedulePage() {
           }}
         >
           <h2 className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted">
-            Family Notes
+            Schedule Notes
           </h2>
           <p className="whitespace-pre-wrap text-sm text-secondary">
             {sharedNote.content}

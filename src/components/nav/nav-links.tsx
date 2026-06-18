@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 
 const links = [
   { href: "/schedule", label: "Schedule" },
-  { href: "/family", label: "Family" },
+  { href: "/family", label: "Members" },
 ];
 
 export function NavLinks({ mobile = false }: { mobile?: boolean }) {

@@ -36,7 +36,7 @@ export default async function FamilyPage() {
     return (
       <main className="mx-auto max-w-2xl px-4 py-8">
         <h1 className="mb-6 text-2xl font-bold text-primary md:text-3xl">
-          Set up your family
+          Set up your group
         </h1>
         <CreateFamilyForm />
       </main>
@@ -141,7 +141,7 @@ export default async function FamilyPage() {
         style={{ borderTop: "1px solid rgba(255, 220, 160, 0.10)" }}
       >
         <h2 className="mb-3 text-lg font-semibold text-primary">
-          Family Notes
+          Schedule Notes
         </h2>
         <NotesForm
           familyGroupId={familyGroup.id}
