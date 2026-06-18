@@ -20,7 +20,7 @@ export function RemoveMemberButton({
       <input type="hidden" name="memberUserId" value={memberUserId} />
       <button
         type="submit"
-        className="rounded bg-red-600 px-3 py-1 text-sm text-white hover:bg-red-700"
+        className="rounded border border-red-200 px-3 py-1 text-sm text-red-600 hover:border-red-300 hover:bg-red-50"
       >
         Remove
       </button>

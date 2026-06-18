@@ -73,14 +73,20 @@ export default async function FamilyPage() {
           {members.map((member) => (
             <li
               key={member.id}
-              className="flex items-center justify-between rounded border p-2"
+              className="flex items-center justify-between rounded-lg border border-gray-200 bg-white p-3 shadow-sm"
             >
-              <div>
+              <div className="flex items-center gap-2">
                 <span className="font-medium">
                   {member.user.name ?? member.user.email}
-                </span>{" "}
-                <span className="text-sm text-gray-500">
-                  ({member.role.toLowerCase()})
+                </span>
+                <span
+                  className={
+                    member.role === "ORGANIZER"
+                      ? "inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700"
+                      : "inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600"
+                  }
+                >
+                  {member.role.toLowerCase()}
                 </span>
               </div>
               {isOrganizer && member.userId !== userId && (
@@ -102,10 +108,12 @@ export default async function FamilyPage() {
             {invites.map((invite) => (
               <li
                 key={invite.id}
-                className="flex items-center justify-between rounded border p-2"
+                className="flex items-center justify-between rounded-lg border border-dashed border-amber-200 bg-amber-50 p-3"
               >
-                <span>{invite.email}</span>
-                <span className="text-sm text-gray-500">pending</span>
+                <span className="text-sm">{invite.email}</span>
+                <span className="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">
+                  pending
+                </span>
               </li>
             ))}
           </ul>
@@ -121,7 +129,7 @@ export default async function FamilyPage() {
       )}
 
       {/* Shared notes */}
-      <section>
+      <section className="border-t border-gray-200 pt-8">
         <h2 className="mb-3 text-lg font-semibold">Family Notes</h2>
         <NotesForm
           familyGroupId={familyGroup.id}

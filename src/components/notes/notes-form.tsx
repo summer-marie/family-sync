@@ -28,7 +28,7 @@ export function NotesForm({ familyGroupId, initialContent }: NotesFormProps) {
         value={content}
         onChange={(e) => setContent(e.target.value)}
         rows={6}
-        className="w-full rounded border p-2 text-sm"
+        className="w-full rounded-lg border border-gray-300 p-3 text-sm focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
       />
       <button
         onClick={handleSave}
