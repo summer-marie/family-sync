@@ -10,6 +10,7 @@ import {
 import { updateVisibility } from "@/features/calendar/actions";
 import { ChatWidget } from "@/components/chat/chat-widget";
 import { ConnectCalendarButton } from "@/components/schedule/connect-calendar-button";
+import { prisma } from "@/lib/prisma";
 
 // ---------------------------------------------------------------------------
 // /schedule page - server component
@@ -147,7 +148,7 @@ export default async function SchedulePage() {
   const timeMin = now.toISOString();
   const timeMax = weekLater.toISOString();
 
-  const [members, schedule] = await Promise.all([
+  const [members, schedule, sharedNote] = await Promise.all([
     getFamilyGroupMembers({ userId, familyGroupId: familyGroup.id }),
     getFamilySchedule({
       userId,
@@ -155,6 +156,7 @@ export default async function SchedulePage() {
       timeMin,
       timeMax,
     }),
+    prisma.sharedNote.findUnique({ where: { familyGroupId: familyGroup.id } }),
   ]);
 
   return (
@@ -185,6 +187,29 @@ export default async function SchedulePage() {
 
       {myConnection && (
         <VisibilityToggle isBusyOnly={myConnection.visibility === "BUSY_ONLY"} />
+      )}
+
+      {sharedNote?.content && (
+        <section
+          className="mb-6 rounded-[10px] p-4"
+          style={{
+            backgroundColor: "#1e1b16",
+            border: "1px solid rgba(255, 220, 160, 0.10)",
+          }}
+        >
+          <h2 className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted">
+            Family Notes
+          </h2>
+          <p className="whitespace-pre-wrap text-sm text-secondary">
+            {sharedNote.content}
+          </p>
+          <a
+            href="/family"
+            className="mt-3 inline-block text-xs text-amber hover:text-amber-hover"
+          >
+            Edit notes
+          </a>
+        </section>
       )}
 
       <section aria-label="Family schedule">
