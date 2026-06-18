@@ -85,7 +85,7 @@ export function ChatWidget({ familyGroupId }: Props) {
         <button
           type="submit"
           disabled={loading || !question.trim()}
-          className="rounded bg-gray-800 px-3 py-1.5 text-sm text-white disabled:opacity-50"
+          className="rounded bg-gray-800 px-3 py-2 text-sm text-white disabled:opacity-50"
         >
           {loading ? "Asking…" : "Ask"}
         </button>

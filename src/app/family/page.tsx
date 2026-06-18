@@ -75,8 +75,8 @@ export default async function FamilyPage() {
               key={member.id}
               className="flex items-center justify-between rounded-lg border border-gray-200 bg-white p-3 shadow-sm"
             >
-              <div className="flex items-center gap-2">
-                <span className="font-medium">
+              <div className="flex min-w-0 items-center gap-2">
+                <span className="truncate font-medium">
                   {member.user.name ?? member.user.email}
                 </span>
                 <span
@@ -110,7 +110,7 @@ export default async function FamilyPage() {
                 key={invite.id}
                 className="flex items-center justify-between rounded-lg border border-dashed border-amber-200 bg-amber-50 p-3"
               >
-                <span className="text-sm">{invite.email}</span>
+                <span className="min-w-0 truncate text-sm">{invite.email}</span>
                 <span className="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">
                   pending
                 </span>
