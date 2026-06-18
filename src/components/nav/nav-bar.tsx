@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { auth, signOut } from "@/auth";
+import { NavLinks } from "./nav-links";
 
-// Sign-out uses a server action so no client component is needed.
 async function SignOutButton() {
   async function handleSignOut() {
     "use server";
@@ -12,7 +12,7 @@ async function SignOutButton() {
     <form action={handleSignOut}>
       <button
         type="submit"
-        className="rounded px-3 py-1 text-sm hover:bg-gray-100"
+        className="w-full rounded-[10px] px-4 py-3 text-left text-sm text-secondary hover:bg-row"
       >
         Sign out
       </button>
@@ -22,38 +22,63 @@ async function SignOutButton() {
 
 export async function NavBar() {
   const session = await auth();
+  const userName = session?.user?.name ?? session?.user?.email ?? "";
 
   return (
-    <nav className="flex flex-wrap items-center justify-between gap-3 border-b px-4 py-3">
-      <Link href="/" className="font-semibold tracking-tight">
-        Family Sync
-      </Link>
+    <>
+      {/* Desktop sidebar — fixed, 256px wide */}
+      <aside
+        className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col lg:flex"
+        style={{
+          backgroundColor: "#100e0b",
+          borderRight: "1px solid rgba(255, 220, 160, 0.08)",
+        }}
+      >
+        <div className="flex flex-1 flex-col overflow-y-auto">
+          {/* Brand */}
+          <div className="px-6 py-6">
+            <Link
+              href="/"
+              className="text-lg font-semibold tracking-tight text-amber"
+            >
+              Family Sync
+            </Link>
+          </div>
 
+          {/* Nav links — only when authenticated */}
+          {session?.user && (
+            <nav className="flex-1 px-3">
+              <NavLinks />
+            </nav>
+          )}
+
+          {/* User info + sign out */}
+          {session?.user && (
+            <div
+              className="px-3 pb-6 pt-4"
+              style={{ borderTop: "1px solid rgba(255, 220, 160, 0.08)" }}
+            >
+              <p className="mb-2 truncate px-4 text-sm text-secondary">
+                {userName}
+              </p>
+              <SignOutButton />
+            </div>
+          )}
+        </div>
+      </aside>
+
+      {/* Mobile bottom tab bar */}
       {session?.user && (
-        <>
-          <div className="flex flex-wrap items-center gap-4">
-            <Link
-              href="/schedule"
-              className="text-sm hover:underline"
-            >
-              Schedule
-            </Link>
-            <Link
-              href="/family"
-              className="text-sm hover:underline"
-            >
-              Family
-            </Link>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-gray-600">
-              {session.user.name ?? session.user.email}
-            </span>
-            <SignOutButton />
-          </div>
-        </>
+        <nav
+          className="fixed inset-x-0 bottom-0 z-40 lg:hidden"
+          style={{
+            backgroundColor: "#100e0b",
+            borderTop: "1px solid rgba(255, 220, 160, 0.08)",
+          }}
+        >
+          <NavLinks mobile />
+        </nav>
       )}
-    </nav>
+    </>
   );
 }

@@ -10,6 +10,7 @@ import {
 import { updateVisibility } from "@/features/calendar/actions";
 import { ChatWidget } from "@/components/chat/chat-widget";
 import { ConnectCalendarButton } from "@/components/schedule/connect-calendar-button";
+import { prisma } from "@/lib/prisma";
 
 // ---------------------------------------------------------------------------
 // /schedule page - server component
@@ -24,34 +25,40 @@ import { ConnectCalendarButton } from "@/components/schedule/connect-calendar-bu
 // MVP constraints: pull-on-demand only, no background sync, 7-day window.
 // ---------------------------------------------------------------------------
 
-// ---------------------------------------------------------------------------
-// VisibilityToggle - inline server-component form for updating the logged-in
-// user's calendar visibility preference. Submits via updateVisibility action.
-// ---------------------------------------------------------------------------
-
 function VisibilityToggle({ isBusyOnly }: { isBusyOnly: boolean }) {
   return (
-    <section className="mb-6 rounded border p-4">
-      <h2 className="mb-2 text-sm font-semibold">Your visibility settings</h2>
+    <section
+      className="mb-6 rounded-[10px] p-4"
+      style={{
+        backgroundColor: "#1e1b16",
+        border: "1px solid rgba(255, 220, 160, 0.10)",
+      }}
+    >
+      <h2 className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted">
+        Visibility settings
+      </h2>
       <form action={updateVisibility}>
-        <label className="flex cursor-pointer items-center gap-2">
+        <label className="flex cursor-pointer items-center gap-3">
           <input
             type="checkbox"
             name="busyOnly"
             defaultChecked={isBusyOnly}
             aria-label="Hide my event titles from family members"
+            className="accent-amber"
           />
-          <span className="text-sm">Hide my event titles from family members</span>
+          <span className="text-sm text-secondary">
+            Hide my event titles from family members
+          </span>
         </label>
         <button
           type="submit"
-          className="mt-3 rounded bg-gray-100 px-3 py-1 text-sm hover:bg-gray-200"
+          className="mt-3 rounded-lg bg-amber px-4 py-1.5 text-xs font-medium text-canvas hover:bg-amber-hover"
         >
           Save
         </button>
       </form>
       {isBusyOnly && (
-        <p className="mt-2 text-xs text-amber-700">
+        <p className="mt-2 text-xs text-amber">
           Your event titles are hidden from family members.
         </p>
       )}
@@ -62,7 +69,6 @@ function VisibilityToggle({ isBusyOnly }: { isBusyOnly: boolean }) {
 export default async function SchedulePage() {
   const session = await auth();
 
-  // Middleware protects this route, but auth() can return null in edge cases.
   if (!session?.user?.id) {
     return (
       <main className="mx-auto max-w-2xl px-4 py-8">
@@ -77,15 +83,26 @@ export default async function SchedulePage() {
   const myConnection = await getConnectionForUser(userId);
   const familyGroup = await getMyFamilyGroup(userId);
 
-  // State 1: no family group - show solo unavailable view + setup prompt
+  // State 1: no family group
   if (!familyGroup) {
     return (
       <main className="mx-auto max-w-2xl px-4 py-8">
-        <h1 className="mb-6 text-2xl font-bold">Family Schedule</h1>
+        <h1 className="mb-6 text-2xl font-bold text-primary md:text-3xl">
+          Family Schedule
+        </h1>
 
         {!myConnection && (
-          <section className="mb-6 rounded border border-blue-200 bg-blue-50 p-4">
-            <p className="mb-3 text-sm text-blue-800">
+          <section
+            className="mb-6 rounded-[10px] p-4"
+            style={{
+              backgroundColor: "#1e1b16",
+              border: "1px solid rgba(255, 220, 160, 0.10)",
+            }}
+          >
+            <p className="mb-1 text-sm font-semibold text-amber">
+              Connect your calendar
+            </p>
+            <p className="mb-3 text-sm text-secondary">
               Connect your Google Calendar to share your availability with your
               family.
             </p>
@@ -100,16 +117,22 @@ export default async function SchedulePage() {
         )}
 
         <section aria-label="Family schedule">
-          <p className="mb-4 text-sm text-gray-600">
-            <a href="/family" className="underline">
+          <p className="mb-4 text-sm text-secondary">
+            <a href="/family" className="text-amber underline hover:text-amber-hover">
               Set up your family group
             </a>{" "}
             to see everyone&apos;s schedule together.
           </p>
-          <ul aria-label="schedule members" className="space-y-2">
-            <li className="rounded border p-3">
-              <span className="font-medium">{userName}</span>{" "}
-              <span className="text-sm text-gray-500">Not connected</span>
+          <ul aria-label="schedule members" className="space-y-3">
+            <li
+              className="rounded-[10px] p-4"
+              style={{
+                backgroundColor: "#1e1b16",
+                border: "1px solid rgba(255, 220, 160, 0.10)",
+              }}
+            >
+              <span className="font-semibold text-primary">{userName}</span>{" "}
+              <span className="text-sm italic text-muted">Not connected</span>
             </li>
           </ul>
         </section>
@@ -119,13 +142,13 @@ export default async function SchedulePage() {
     );
   }
 
-  // State 2 / 3: has a family group - pull the full schedule on demand
+  // State 2 / 3: has a family group — pull schedule on demand
   const now = new Date();
   const weekLater = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
   const timeMin = now.toISOString();
   const timeMax = weekLater.toISOString();
 
-  const [members, schedule] = await Promise.all([
+  const [members, schedule, sharedNote] = await Promise.all([
     getFamilyGroupMembers({ userId, familyGroupId: familyGroup.id }),
     getFamilySchedule({
       userId,
@@ -133,16 +156,28 @@ export default async function SchedulePage() {
       timeMin,
       timeMax,
     }),
+    prisma.sharedNote.findUnique({ where: { familyGroupId: familyGroup.id } }),
   ]);
 
   return (
     <main className="mx-auto max-w-2xl px-4 py-8">
-      <h1 className="mb-2 text-2xl font-bold">Family Schedule</h1>
-      <p className="mb-6 text-sm text-gray-500">{familyGroup.name}</p>
+      <h1 className="mb-1 text-2xl font-bold text-primary md:text-3xl">
+        Family Schedule
+      </h1>
+      <p className="mb-6 text-sm text-secondary">{familyGroup.name}</p>
 
       {!myConnection && (
-        <section className="mb-6 rounded border border-blue-200 bg-blue-50 p-4">
-          <p className="mb-3 text-sm text-blue-800">
+        <section
+          className="mb-6 rounded-[10px] p-4"
+          style={{
+            backgroundColor: "#1e1b16",
+            border: "1px solid rgba(255, 220, 160, 0.10)",
+          }}
+        >
+          <p className="mb-1 text-sm font-semibold text-amber">
+            Connect your calendar
+          </p>
+          <p className="mb-3 text-sm text-secondary">
             Connect your Google Calendar to share your availability with your
             family.
           </p>
@@ -154,6 +189,29 @@ export default async function SchedulePage() {
         <VisibilityToggle isBusyOnly={myConnection.visibility === "BUSY_ONLY"} />
       )}
 
+      {sharedNote?.content && (
+        <section
+          className="mb-6 rounded-[10px] p-4"
+          style={{
+            backgroundColor: "#1e1b16",
+            border: "1px solid rgba(255, 220, 160, 0.10)",
+          }}
+        >
+          <h2 className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted">
+            Schedule Notes
+          </h2>
+          <p className="whitespace-pre-wrap text-sm text-secondary">
+            {sharedNote.content}
+          </p>
+          <a
+            href="/family"
+            className="mt-3 inline-block text-xs text-amber hover:text-amber-hover"
+          >
+            Edit notes
+          </a>
+        </section>
+      )}
+
       <section aria-label="Family schedule">
         <ul aria-label="schedule members" className="space-y-3">
           {schedule.map((entry) => {
@@ -162,17 +220,32 @@ export default async function SchedulePage() {
               member?.user.name ?? member?.user.email ?? entry.userId;
 
             return (
-              <li key={entry.userId} className="rounded border p-3">
-                <div className="mb-1 font-medium">{name}</div>
+              <li
+                key={entry.userId}
+                className="rounded-[10px] p-4"
+                style={{
+                  backgroundColor: "#1e1b16",
+                  border: "1px solid rgba(255, 220, 160, 0.10)",
+                }}
+              >
+                <div className="mb-3 font-semibold text-primary">{name}</div>
                 {entry.status === "unavailable" ? (
-                  <p className="text-sm text-gray-500">Not connected</p>
+                  <p className="text-sm italic text-muted">Not connected</p>
                 ) : entry.events.length === 0 ? (
-                  <p className="text-sm text-gray-500">No events this week</p>
+                  <p className="text-sm italic text-muted">
+                    No events this week
+                  </p>
                 ) : (
-                  <ul className="space-y-1">
+                  <ul className="space-y-2">
                     {entry.events.map((event, i) => (
-                      <li key={i} className="text-sm">
-                        <span className="font-medium">{event.title}</span>
+                      <li
+                        key={i}
+                        className="rounded-r-md bg-row py-2 pl-3 pr-3 text-sm text-secondary"
+                        style={{ borderLeft: "2px solid #d4a853" }}
+                      >
+                        <span className="font-medium text-primary">
+                          {event.title}
+                        </span>
                         {" — "}
                         {new Date(event.start).toLocaleString()}
                       </li>

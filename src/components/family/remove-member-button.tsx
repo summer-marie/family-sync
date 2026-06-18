@@ -20,9 +20,10 @@ export function RemoveMemberButton({
       <input type="hidden" name="memberUserId" value={memberUserId} />
       <button
         type="submit"
-        className="rounded bg-red-600 px-3 py-1 text-sm text-white hover:bg-red-700"
+        aria-label="Remove member"
+        className="text-muted hover:text-danger"
       >
-        Remove
+        &times;
       </button>
     </form>
   );

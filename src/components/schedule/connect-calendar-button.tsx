@@ -11,7 +11,7 @@ export function ConnectCalendarButton() {
     <form action={connectCalendarAction}>
       <button
         type="submit"
-        className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="rounded-lg bg-amber px-4 py-2 text-sm font-medium text-canvas hover:bg-amber-hover focus:outline-none focus:ring-2 focus:ring-amber/40"
       >
         Connect Google Calendar
       </button>
