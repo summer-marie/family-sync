@@ -143,10 +143,7 @@ export default async function FamilyPage() {
         <h2 className="mb-3 text-lg font-semibold text-primary">
           Schedule Notes
         </h2>
-        <NotesForm
-          familyGroupId={familyGroup.id}
-          initialContent={sharedNote?.content ?? ""}
-        />
+        <NotesForm familyGroupId={familyGroup.id} />
       </section>
 
       {/* Pending invites section */}

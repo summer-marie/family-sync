@@ -4,11 +4,10 @@ import { useState } from "react";
 
 interface NotesFormProps {
   familyGroupId: string;
-  initialContent: string;
 }
 
-export function NotesForm({ familyGroupId, initialContent }: NotesFormProps) {
-  const [content, setContent] = useState(initialContent);
+export function NotesForm({ familyGroupId }: NotesFormProps) {
+  const [content, setContent] = useState("");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
