@@ -18,7 +18,7 @@ export default function RootLayout({
         <div className="flex min-h-screen">
           <NavBar />
           {/* Offset right of fixed sidebar on desktop; pad bottom for mobile tab bar */}
-          <div className="min-w-0 flex-1 pb-16 lg:ml-64 lg:pb-0">
+          <div className="min-w-0 flex-1 bg-canvas pb-16 lg:ml-64 lg:pb-0">
             {children}
           </div>
         </div>
