@@ -135,6 +135,20 @@ export default async function FamilyPage() {
         </ul>
       </section>
 
+      {/* Shared notes */}
+      <section
+        className="pt-8"
+        style={{ borderTop: "1px solid rgba(255, 220, 160, 0.10)" }}
+      >
+        <h2 className="mb-3 text-lg font-semibold text-primary">
+          Family Notes
+        </h2>
+        <NotesForm
+          familyGroupId={familyGroup.id}
+          initialContent={sharedNote?.content ?? ""}
+        />
+      </section>
+
       {/* Pending invites section */}
       {invites.length > 0 && (
         <section className="mb-8">
@@ -186,20 +200,6 @@ export default async function FamilyPage() {
           <InviteForm familyGroupId={familyGroup.id} />
         </section>
       )}
-
-      {/* Shared notes */}
-      <section
-        className="pt-8"
-        style={{ borderTop: "1px solid rgba(255, 220, 160, 0.10)" }}
-      >
-        <h2 className="mb-3 text-lg font-semibold text-primary">
-          Family Notes
-        </h2>
-        <NotesForm
-          familyGroupId={familyGroup.id}
-          initialContent={sharedNote?.content ?? ""}
-        />
-      </section>
     </main>
   );
 }
