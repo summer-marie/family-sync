@@ -67,8 +67,8 @@ export function ChatWidget({ familyGroupId }: Props) {
   }
 
   return (
-    <section aria-label="AI Schedule Chat" className="mt-6 rounded border p-4">
-      <h2 className="mb-3 text-sm font-semibold">Ask about the schedule</h2>
+    <section aria-label="AI Schedule Chat" className="mt-10 rounded-lg border-2 border-gray-200 bg-gray-50 p-5">
+      <h2 className="mb-4 text-base font-semibold">Ask about the schedule</h2>
       <form onSubmit={handleSubmit} className="flex gap-2">
         <input
           type="text"

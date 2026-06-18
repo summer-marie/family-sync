@@ -31,8 +31,10 @@ import { ConnectCalendarButton } from "@/components/schedule/connect-calendar-bu
 
 function VisibilityToggle({ isBusyOnly }: { isBusyOnly: boolean }) {
   return (
-    <section className="mb-6 rounded border p-4">
-      <h2 className="mb-2 text-sm font-semibold">Your visibility settings</h2>
+    <section className="mb-6 rounded-lg border border-gray-200 bg-gray-50 p-3">
+      <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-400">
+        Visibility settings
+      </h2>
       <form action={updateVisibility}>
         <label className="flex cursor-pointer items-center gap-2">
           <input
@@ -41,11 +43,13 @@ function VisibilityToggle({ isBusyOnly }: { isBusyOnly: boolean }) {
             defaultChecked={isBusyOnly}
             aria-label="Hide my event titles from family members"
           />
-          <span className="text-sm">Hide my event titles from family members</span>
+          <span className="text-sm text-gray-700">
+            Hide my event titles from family members
+          </span>
         </label>
         <button
           type="submit"
-          className="mt-3 rounded bg-gray-100 px-3 py-1 text-sm hover:bg-gray-200"
+          className="mt-2 rounded bg-white px-3 py-1 text-xs font-medium text-gray-600 ring-1 ring-gray-300 hover:bg-gray-50"
         >
           Save
         </button>
@@ -84,8 +88,11 @@ export default async function SchedulePage() {
         <h1 className="mb-6 text-2xl font-bold">Family Schedule</h1>
 
         {!myConnection && (
-          <section className="mb-6 rounded border border-blue-200 bg-blue-50 p-4">
-            <p className="mb-3 text-sm text-blue-800">
+          <section className="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4">
+            <p className="mb-1 text-sm font-semibold text-blue-900">
+              Connect your calendar
+            </p>
+            <p className="mb-3 text-sm text-blue-700">
               Connect your Google Calendar to share your availability with your
               family.
             </p>
@@ -106,10 +113,10 @@ export default async function SchedulePage() {
             </a>{" "}
             to see everyone&apos;s schedule together.
           </p>
-          <ul aria-label="schedule members" className="space-y-2">
-            <li className="rounded border p-3">
-              <span className="font-medium">{userName}</span>{" "}
-              <span className="text-sm text-gray-500">Not connected</span>
+          <ul aria-label="schedule members" className="space-y-4">
+            <li className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+              <span className="font-semibold">{userName}</span>{" "}
+              <span className="text-sm italic text-gray-400">Not connected</span>
             </li>
           </ul>
         </section>
@@ -141,8 +148,11 @@ export default async function SchedulePage() {
       <p className="mb-6 text-sm text-gray-500">{familyGroup.name}</p>
 
       {!myConnection && (
-        <section className="mb-6 rounded border border-blue-200 bg-blue-50 p-4">
-          <p className="mb-3 text-sm text-blue-800">
+        <section className="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4">
+          <p className="mb-1 text-sm font-semibold text-blue-900">
+            Connect your calendar
+          </p>
+          <p className="mb-3 text-sm text-blue-700">
             Connect your Google Calendar to share your availability with your
             family.
           </p>
@@ -155,21 +165,26 @@ export default async function SchedulePage() {
       )}
 
       <section aria-label="Family schedule">
-        <ul aria-label="schedule members" className="space-y-3">
+        <ul aria-label="schedule members" className="space-y-4">
           {schedule.map((entry) => {
             const member = members.find((m) => m.userId === entry.userId);
             const name =
               member?.user.name ?? member?.user.email ?? entry.userId;
 
             return (
-              <li key={entry.userId} className="rounded border p-3">
-                <div className="mb-1 font-medium">{name}</div>
+              <li
+                key={entry.userId}
+                className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm"
+              >
+                <div className="mb-2 font-semibold">{name}</div>
                 {entry.status === "unavailable" ? (
-                  <p className="text-sm text-gray-500">Not connected</p>
+                  <p className="text-sm italic text-gray-400">Not connected</p>
                 ) : entry.events.length === 0 ? (
-                  <p className="text-sm text-gray-500">No events this week</p>
+                  <p className="text-sm italic text-gray-400">
+                    No events this week
+                  </p>
                 ) : (
-                  <ul className="space-y-1">
+                  <ul className="space-y-1.5">
                     {entry.events.map((event, i) => (
                       <li key={i} className="text-sm">
                         <span className="font-medium">{event.title}</span>
