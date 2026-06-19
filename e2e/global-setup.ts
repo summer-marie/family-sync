@@ -29,7 +29,11 @@ const INVITE_ORGANIZER_NAME = 'E2E Invite Organizer'
 const INVITE_RECIPIENT_EMAIL = 'e2e-invite-recipient@family-sync.test'
 const INVITE_RECIPIENT_NAME = 'E2E Invite Recipient'
 const INVITE_ALREADY_MEMBER_EMAIL = 'e2e-invite-already-member@family-sync.test'
-const INVITE_ALREADY_MEMBER_NAME = 'E2E Already Member User'
+// Avoid the literal words "Already Member" in the display name: email-invites
+// spec :120 asserts getByText(/already.*member|already.*family/i) which would
+// otherwise also match this user's name in the nav sidebar, causing a strict-
+// mode violation against the h1/p on the accept page.
+const INVITE_ALREADY_MEMBER_NAME = 'E2E In-Group User'
 
 // Known tokens pre-seeded so E2E tests can navigate directly to accept URLs.
 const INVITE_TOKEN_VALID = 'e2e-valid-invite-token'
