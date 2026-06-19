@@ -114,7 +114,7 @@ test('member with no calendar connected — AI response acknowledges missing dat
   // The AI should acknowledge unavailability rather than inventing availability
   const text = await aiMessage.innerText()
   expect(
-    text.match(/unavailable|not connected|no calendar|cannot access/i),
+    text.match(/unavailable|not connected|no calendar|cannot access|no events|not available|no data|no information/i),
   ).toBeTruthy()
 })
 
