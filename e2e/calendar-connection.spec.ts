@@ -103,8 +103,9 @@ test.describe('Shared schedule view', () => {
     await expect(page.getByRole('heading', { name: /something went wrong|error/i })).not.toBeVisible()
 
     // The main schedule heading must still be visible.
+    // level: 1 avoids matching the ChatWidget's "Ask about the schedule" h2.
     await expect(
-      page.getByRole('heading', { name: /schedule|family calendar|availability/i }),
+      page.getByRole('heading', { name: /family schedule/i, level: 1 }),
     ).toBeVisible()
   })
 })
