@@ -5,11 +5,7 @@ import {
   getFamilySchedule,
   AuthorizationError,
 } from "@/features/calendar/services";
-import { parseQuestion, QuestionType } from "@/lib/schedule/question-parser";
 import { buildChatMessages } from "@/lib/schedule/prompt-builder";
-
-const OUT_OF_SCOPE_MESSAGE =
-  "I can only answer scheduling questions — for example, who is busy, when everyone is free, or what is on the calendar for a given day.";
 
 export async function POST(req: Request): Promise<Response> {
   // Step 1: authenticate
@@ -35,11 +31,6 @@ export async function POST(req: Request): Promise<Response> {
 
   if (!question) {
     return new Response("Bad Request: question is required", { status: 400 });
-  }
-
-  // Step 3: reject out-of-scope questions before touching family/calendar data
-  if (parseQuestion(question) === QuestionType.OUT_OF_SCOPE) {
-    return Response.json({ message: OUT_OF_SCOPE_MESSAGE });
   }
 
   if (!familyGroupId) {
