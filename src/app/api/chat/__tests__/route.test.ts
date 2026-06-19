@@ -193,7 +193,7 @@ describe("POST /api/chat — authorization", () => {
 // ---------------------------------------------------------------------------
 
 describe("POST /api/chat — happy path", () => {
-  it("calls streamText with the full messages array from buildChatMessages", async () => {
+  it("calls streamText with system as a top-level string and messages containing only user/assistant turns", async () => {
     auth.mockResolvedValue(mockSession);
 
     await POST(
@@ -207,9 +207,16 @@ describe("POST /api/chat — happy path", () => {
 
     expect(streamText).toHaveBeenCalledWith(
       expect.objectContaining({
+        system: expect.any(String),
+        messages: expect.arrayContaining([
+          expect.objectContaining({ role: "user" }),
+        ]),
+      }),
+    );
+    expect(streamText).not.toHaveBeenCalledWith(
+      expect.objectContaining({
         messages: expect.arrayContaining([
           expect.objectContaining({ role: "system" }),
-          expect.objectContaining({ role: "user" }),
         ]),
       }),
     );

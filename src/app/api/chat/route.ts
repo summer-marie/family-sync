@@ -82,9 +82,14 @@ export async function POST(req: Request): Promise<Response> {
     messages: messages as ConversationMessage[],
   });
 
+  // Split the system entry out so it goes through the dedicated system option
+  // rather than the messages array, which avoids the Vercel AI SDK security warning.
+  const [systemEntry, ...conversationMessages] = chatMessages;
+
   const result = streamText({
     model: openai("gpt-4o-mini"),
-    messages: chatMessages,
+    system: systemEntry.content,
+    messages: conversationMessages,
   });
 
   return result.toTextStreamResponse();
