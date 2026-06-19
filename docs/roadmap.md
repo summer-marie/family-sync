@@ -483,3 +483,59 @@ Update these as you go. Add a short note when something blocks a step.
 
 ### Issues and notes
 - (Add blocker notes here as they come up.)
+
+---
+
+## Refactor Steps
+
+### Chat Refactor — Open-Ended AI Chat (spec 006)
+- [ ] Delete `question-parser.ts` and its tests — commit: `refactor: remove question-parser gate from AI chat route`
+- [ ] Write failing unit tests for prompt-builder and route — capture `14-ai-chat-refactor-red.txt`
+- [ ] Commit: `test: red — prompt-builder and chat route refactor tests`
+- [ ] Implement prompt-builder rewrite and route update to green — capture `14-ai-chat-refactor-green.txt`
+- [ ] Commit: `feat: open-ended AI chat with system prompt and multi-turn memory`
+- [ ] Write failing Playwright E2E tests — capture `14-ai-chat-refactor-e2e-red.txt`
+- [ ] Commit: `test: red — E2E tests for open-ended AI chat refactor`
+- [ ] Implement UI changes (multi-turn ChatWidget, chat thread UI) to green — capture `14-ai-chat-refactor-e2e-green.txt`
+- [ ] Commit: `feat: 90-day schedule fetch, session-cached schedule, multi-turn chat UI`
+- Spec: `docs/specs/006-ai-chat-refactor.md`
+
+### Email Invites via Resend (spec 007)
+- [ ] Add `token` and `status` fields to `Invite` schema, apply migration — commit: `chore: add invite token and status fields to schema`
+- [ ] Write failing unit and integration tests — capture `15-email-invites-red.txt`
+- [ ] Commit: `test: red — email invite service and accept flow tests`
+- [ ] Implement Resend client, email sender, invite service update, accept action to green — capture `15-email-invites-green.txt`
+- [ ] Commit: `feat: email invite sending and accept flow`
+- [ ] Write failing Playwright E2E tests — capture `15-email-invites-e2e-red.txt`
+- [ ] Commit: `test: red — E2E tests for email invite flow`
+- [ ] Implement accept invite page and Members page status badges to green — capture `15-email-invites-e2e-green.txt`
+- [ ] Commit: `feat: accept invite page and members page status badges`
+- Spec: `docs/specs/007-email-invites.md`
+
+---
+
+## Refactor Steps
+
+### Chat Refactor — Open-Ended AI Chat (spec 006)
+- [ ] Delete `question-parser.ts` and its tests — commit: `refactor: remove question-parser gate from AI chat route`
+- [ ] Write failing unit tests for prompt-builder and route — capture `14-ai-chat-refactor-red.txt`
+- [ ] Commit: `test: red — prompt-builder and chat route refactor tests`
+- [ ] Implement prompt-builder rewrite and route update to green — capture `14-ai-chat-refactor-green.txt`
+- [ ] Commit: `feat: open-ended AI chat with system prompt and multi-turn memory`
+- [ ] Write failing Playwright E2E tests — capture `14-ai-chat-refactor-e2e-red.txt`
+- [ ] Commit: `test: red — E2E tests for open-ended AI chat refactor`
+- [ ] Implement UI changes (90-day fetch, schedule prop, multi-turn ChatWidget) to green — capture `14-ai-chat-refactor-e2e-green.txt`
+- [ ] Commit: `feat: 90-day schedule fetch, session-cached schedule, multi-turn chat UI`
+- Spec: `docs/specs/006-ai-chat-refactor.md`
+
+### Email Invites via Resend (spec 007)
+- What: replace the current no-op invite flow (creates a DB record but sends nothing) with real email delivery via Resend. Invited person receives a link, signs in with Google, lands on a confirmation page, and is added to the family group on accept. Adds `token` and `status` fields to `Invite`, a Resend email sender, an accept invite page, and status badges on the Members page.
+- Depends on: existing invite infrastructure (Step 2 complete).
+- Files: `prisma/schema.prisma` (token + status), `src/lib/resend.ts` (new), `src/lib/email/send-invite-email.ts` (new), `src/features/family/services.ts`, `src/app/invite/[token]/page.tsx` (new), `src/app/invite/[token]/actions.ts` (new), `src/app/family/page.tsx`.
+- Tests:
+  - Unit: token generated per invite; sendInviteEmail called with correct args; email send failure does not crash invite creation; accept action creates membership and marks invite ACCEPTED.
+  - Integration: expired token error; invalid token error; already-in-group error; duplicate invite rejected.
+  - E2E: invite form → pending badge; accept link → confirmation page → accepted; unauthenticated redirects to sign-in; expired link error; already-in-group error.
+- Protected: YES — Prisma schema migration, invite service.
+- TDD stop commits (in order): schema migration → red unit/integration tests → green implementation → red E2E → green E2E.
+- Spec: `docs/specs/007-email-invites.md`
