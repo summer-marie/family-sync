@@ -246,7 +246,7 @@ export async function getFamilySchedule(input: {
       input.timeMin,
       input.timeMax,
     );
-    entry.name = member.user.name ?? member.user.email ?? member.userId;
+    entry.name = member.user?.name ?? member.user?.email ?? member.userId;
     entries.push(entry);
   }
 
