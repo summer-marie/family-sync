@@ -148,13 +148,23 @@ export default async function SchedulePage() {
   const timeMin = now.toISOString();
   const timeMax = weekLater.toISOString();
 
-  const [members, schedule, sharedNote] = await Promise.all([
+  const ninetyDays = new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000);
+  const aiTimeMax = ninetyDays.toISOString();
+
+  const [members, schedule, aiSchedule, sharedNote] = await Promise.all([
     getFamilyGroupMembers({ userId, familyGroupId: familyGroup.id }),
     getFamilySchedule({
       userId,
       familyGroupId: familyGroup.id,
       timeMin,
       timeMax,
+    }),
+    // 90-day window for the AI chat — separate from the 7-day UI view.
+    getFamilySchedule({
+      userId,
+      familyGroupId: familyGroup.id,
+      timeMin,
+      timeMax: aiTimeMax,
     }),
     prisma.sharedNote.findUnique({ where: { familyGroupId: familyGroup.id } }),
   ]);
@@ -258,7 +268,11 @@ export default async function SchedulePage() {
         </ul>
       </section>
 
-      <ChatWidget familyGroupId={familyGroup.id} />
+      <ChatWidget
+        familyGroupId={familyGroup.id}
+        familyName={familyGroup.name}
+        schedule={aiSchedule}
+      />
     </main>
   );
 }

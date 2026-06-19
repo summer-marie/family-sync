@@ -27,7 +27,7 @@ test.describe.serial('Shared notes - member (Spec 005)', () => {
 
     // The notes section must be present for any authenticated group member.
     // In RED: this heading does not exist → test fails here.
-    const notesHeading = page.getByRole('heading', { name: /family notes|shared notes/i })
+    const notesHeading = page.getByRole('heading', { name: /schedule notes/i })
     await expect(notesHeading).toBeVisible()
   })
 
