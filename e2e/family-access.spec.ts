@@ -77,7 +77,7 @@ test.describe.serial('Family group management', () => {
     await expect(page.getByRole('heading', { name: /members/i })).toBeVisible()
 
     // The organizer (E2E Test User from global-setup) should be listed
-    await expect(page.getByText('E2E Test User')).toBeVisible()
+    await expect(page.getByRole('main').getByText('E2E Test User')).toBeVisible()
 
     // The organizer role should be visible
     await expect(page.getByText(/organizer/i)).toBeVisible()

@@ -43,4 +43,18 @@ export const notesTest = base.extend({
   },
 })
 
+// Chat refactor test user — pre-seeded with a family group (E2E Chat Family)
+// and a second member, both without CalendarConnections. Used by
+// ai-chat-refactor.spec.ts for multi-turn and schedule-context tests.
+export const chatTest = base.extend({
+  page: async ({ browser }, use) => {
+    const context = await browser.newContext({
+      storageState: path.join(process.cwd(), 'e2e', '.auth', 'chat-user.json'),
+    })
+    const page = await context.newPage()
+    await use(page)
+    await context.close()
+  },
+})
+
 export { expect }

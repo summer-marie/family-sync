@@ -149,6 +149,63 @@ async function globalSetup() {
 
     console.log(`[global-setup] seeded notes test user: ${notesUser.email}`)
     console.log('[global-setup] notes auth state written to e2e/.auth/notes-user.json')
+
+    // -----------------------------------------------------------------------
+    // Chat refactor test user (e2e-chat@family-sync.test)
+    // Pre-seeded with a family group (E2E Chat Family) and a second member
+    // (e2e-chat-member2@family-sync.test) so ai-chat-refactor.spec.ts can
+    // exercise multi-member schedule queries without conflicting with other
+    // test users. Neither member has a CalendarConnection — the AI will see
+    // "calendar unavailable" for all members, which is the realistic state
+    // achievable in E2E without mocking Google Calendar.
+    // -----------------------------------------------------------------------
+    const chatUser = await prisma.user.upsert({
+      where: { email: 'e2e-chat@family-sync.test' },
+      update: {},
+      create: { email: 'e2e-chat@family-sync.test', name: 'E2E Chat User' },
+    })
+
+    const chatMember2 = await prisma.user.upsert({
+      where: { email: 'e2e-chat-member2@family-sync.test' },
+      update: {},
+      create: { email: 'e2e-chat-member2@family-sync.test', name: 'E2E Chat Member 2' },
+    })
+
+    // Clean family groups for both members to avoid stale state.
+    await prisma.familyGroup.deleteMany({
+      where: { memberships: { some: { userId: chatUser.id } } },
+    })
+
+    const chatFamily = await prisma.familyGroup.create({
+      data: {
+        name: 'E2E Chat Family',
+        memberships: {
+          create: { userId: chatUser.id, role: 'ORGANIZER' },
+        },
+      },
+    })
+
+    // Add second member separately (Prisma nested createMany not supported).
+    await prisma.groupMembership.create({
+      data: { userId: chatMember2.id, familyGroupId: chatFamily.id, role: 'MEMBER' },
+    })
+
+    await prisma.session.deleteMany({ where: { userId: chatUser.id } })
+
+    const chatSessionToken = randomUUID()
+    const chatExpires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+
+    await prisma.session.create({
+      data: { sessionToken: chatSessionToken, userId: chatUser.id, expires: chatExpires },
+    })
+
+    fs.writeFileSync(
+      path.join(AUTH_DIR, 'chat-user.json'),
+      JSON.stringify(buildStorageState(chatSessionToken, chatExpires), null, 2),
+    )
+
+    console.log(`[global-setup] seeded chat test user: ${chatUser.email}`)
+    console.log('[global-setup] chat auth state written to e2e/.auth/chat-user.json')
   } finally {
     await prisma.$disconnect()
   }

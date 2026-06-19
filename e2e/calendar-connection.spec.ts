@@ -29,9 +29,10 @@ test.describe('Schedule page - access', () => {
     // Must not be kicked to sign-in or an error page
     await expect(page).not.toHaveURL(/sign-in|login|error/)
 
-    // Page must have a visible heading identifying it as a schedule view
+    // Page must have a visible heading identifying it as a schedule view.
+    // level: 1 avoids matching the ChatWidget's "Ask about the schedule" h2.
     await expect(
-      page.getByRole('heading', { name: /schedule|family calendar|availability/i }),
+      page.getByRole('heading', { name: /family schedule/i, level: 1 }),
     ).toBeVisible()
   })
 
@@ -102,8 +103,9 @@ test.describe('Shared schedule view', () => {
     await expect(page.getByRole('heading', { name: /something went wrong|error/i })).not.toBeVisible()
 
     // The main schedule heading must still be visible.
+    // level: 1 avoids matching the ChatWidget's "Ask about the schedule" h2.
     await expect(
-      page.getByRole('heading', { name: /schedule|family calendar|availability/i }),
+      page.getByRole('heading', { name: /family schedule/i, level: 1 }),
     ).toBeVisible()
   })
 })

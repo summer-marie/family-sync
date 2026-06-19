@@ -4,15 +4,13 @@ import { openai } from "@ai-sdk/openai";
 import {
   getFamilySchedule,
   AuthorizationError,
+  type FamilyScheduleEntry,
 } from "@/features/calendar/services";
-import { parseQuestion, QuestionType } from "@/lib/schedule/question-parser";
 import { buildChatMessages } from "@/lib/schedule/prompt-builder";
 
-const OUT_OF_SCOPE_MESSAGE =
-  "I can only answer scheduling questions — for example, who is busy, when everyone is free, or what is on the calendar for a given day.";
+type ConversationMessage = { role: "user" | "assistant"; content: string };
 
 export async function POST(req: Request): Promise<Response> {
-  // Step 1: authenticate
   const session = await auth();
   if (!session?.user?.id) {
     return new Response("Unauthorized", { status: 401 });
@@ -20,26 +18,29 @@ export async function POST(req: Request): Promise<Response> {
 
   const userId = session.user.id;
 
-  // Step 2: validate request body
-  let body: { question?: unknown; familyGroupId?: unknown };
+  let body: {
+    messages?: unknown;
+    familyGroupId?: unknown;
+    familyName?: unknown;
+    schedule?: unknown;
+  };
   try {
     body = await req.json();
   } catch {
     return new Response("Bad Request: invalid JSON", { status: 400 });
   }
 
-  const question =
-    typeof body.question === "string" ? body.question.trim() : "";
+  const messages = Array.isArray(body.messages) ? body.messages : null;
   const familyGroupId =
     typeof body.familyGroupId === "string" ? body.familyGroupId : "";
+  const familyName =
+    typeof body.familyName === "string" ? body.familyName : "Family";
+  const scheduleFromBody = Array.isArray(body.schedule)
+    ? (body.schedule as FamilyScheduleEntry[])
+    : null;
 
-  if (!question) {
-    return new Response("Bad Request: question is required", { status: 400 });
-  }
-
-  // Step 3: reject out-of-scope questions before touching family/calendar data
-  if (parseQuestion(question) === QuestionType.OUT_OF_SCOPE) {
-    return Response.json({ message: OUT_OF_SCOPE_MESSAGE });
+  if (!messages || messages.length === 0) {
+    return new Response("Bad Request: messages is required", { status: 400 });
   }
 
   if (!familyGroupId) {
@@ -48,31 +49,47 @@ export async function POST(req: Request): Promise<Response> {
     });
   }
 
-  // Step 4: load authorized, privacy-filtered schedule data
-  const now = new Date();
-  const weekLater = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+  // Use the session-cached schedule if the client sent it; otherwise fetch 90 days.
+  // Privacy filtering runs inside getFamilySchedule — client only ever receives
+  // already-filtered data, so the cached copy is safe to reuse.
+  let schedule: FamilyScheduleEntry[];
+  if (scheduleFromBody) {
+    schedule = scheduleFromBody;
+  } else {
+    const now = new Date();
+    const ninetyDaysLater = new Date(
+      now.getTime() + 90 * 24 * 60 * 60 * 1000,
+    );
 
-  let schedule;
-  try {
-    schedule = await getFamilySchedule({
-      userId,
-      familyGroupId,
-      timeMin: now.toISOString(),
-      timeMax: weekLater.toISOString(),
-    });
-  } catch (err) {
-    if (err instanceof AuthorizationError) {
-      return new Response("Forbidden", { status: 403 });
+    try {
+      schedule = await getFamilySchedule({
+        userId,
+        familyGroupId,
+        timeMin: now.toISOString(),
+        timeMax: ninetyDaysLater.toISOString(),
+      });
+    } catch (err) {
+      if (err instanceof AuthorizationError) {
+        return new Response("Forbidden", { status: 403 });
+      }
+      return new Response("Internal Server Error", { status: 500 });
     }
-    return new Response("Internal Server Error", { status: 500 });
   }
 
-  // Step 5-7: build prompt, call model, stream response
-  const messages = buildChatMessages(question, schedule);
+  const chatMessages = buildChatMessages({
+    familyName,
+    schedule,
+    messages: messages as ConversationMessage[],
+  });
+
+  // Split the system entry out so it goes through the dedicated system option
+  // rather than the messages array, which avoids the Vercel AI SDK security warning.
+  const [systemEntry, ...conversationMessages] = chatMessages;
 
   const result = streamText({
     model: openai("gpt-4o-mini"),
-    messages,
+    system: systemEntry.content,
+    messages: conversationMessages,
   });
 
   return result.toTextStreamResponse();
