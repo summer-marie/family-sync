@@ -1,5 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
+// Prevent the resend module from throwing at import time when RESEND_API_KEY
+// is not set in the test environment. acceptInviteByToken does not send email,
+// but services.ts imports sendInviteEmail at the module level.
+vi.mock("@/lib/email/send-invite-email", () => ({
+  sendInviteEmail: vi.fn(),
+}));
+
 // Mock prisma so tests run without a live DB connection.
 vi.mock("@/lib/prisma", () => ({
   prisma: {

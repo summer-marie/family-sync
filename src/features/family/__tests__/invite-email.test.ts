@@ -85,7 +85,9 @@ describe("inviteMember — email sending", () => {
     const invite1 = { ...mockInvite, token: "tok-111" };
     const invite2 = { ...mockInvite, id: "invite-2", email: "other@example.com", token: "tok-222" };
 
-    prisma.groupMembership.findFirst.mockResolvedValue(mockOrganizerMembership);
+    prisma.groupMembership.findFirst
+      .mockResolvedValueOnce(mockOrganizerMembership) // assertMembership
+      .mockResolvedValueOnce(null); // existing member check
     prisma.invite.findFirst.mockResolvedValue(null);
     sendInviteEmail.mockResolvedValue(undefined);
 
@@ -100,7 +102,9 @@ describe("inviteMember — email sending", () => {
     const firstUrl: string = sendInviteEmail.mock.calls[0][0].acceptUrl;
 
     vi.resetAllMocks();
-    prisma.groupMembership.findFirst.mockResolvedValue(mockOrganizerMembership);
+    prisma.groupMembership.findFirst
+      .mockResolvedValueOnce(mockOrganizerMembership) // assertMembership
+      .mockResolvedValueOnce(null); // existing member check
     prisma.invite.findFirst.mockResolvedValue(null);
     sendInviteEmail.mockResolvedValue(undefined);
 

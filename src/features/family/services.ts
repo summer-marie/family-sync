@@ -1,6 +1,7 @@
 import "server-only";
 
 import { prisma } from "@/lib/prisma";
+import { sendInviteEmail } from "@/lib/email/send-invite-email";
 
 // ---------------------------------------------------------------------------
 // Error types
@@ -169,11 +170,17 @@ export async function getFamilyGroupMembers(input: {
 /**
  * Create an email-based invite for a family group. Only the organizer can
  * invite. Duplicate invites (same email in the same group) are rejected.
+ *
+ * After creating the invite, sends an email via Resend. If the email send
+ * fails, the error is logged but not re-thrown — the invite record still
+ * exists and the organizer can share the link manually if needed.
  */
 export async function inviteMember(input: {
   userId: string;
   familyGroupId: string;
   email: string;
+  inviterName?: string;
+  familyName?: string;
 }) {
   validateEmail(input.email);
 
@@ -212,10 +219,22 @@ export async function inviteMember(input: {
       familyGroupId: input.familyGroupId,
       email: input.email,
       role: "MEMBER",
-      // MVP: invites expire 30 days from creation.
-      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     },
   });
+
+  // Send invite email. Failure is non-fatal — log and continue.
+  const acceptUrl = `${process.env.NEXTAUTH_URL ?? "http://localhost:3000"}/invite/${invite.token}`;
+  try {
+    await sendInviteEmail({
+      to: input.email,
+      inviterName: input.inviterName ?? "A family member",
+      familyName: input.familyName ?? "your family",
+      acceptUrl,
+    });
+  } catch (err) {
+    console.error("[inviteMember] Failed to send invite email:", err);
+  }
 
   return invite;
 }
@@ -269,6 +288,59 @@ export async function acceptInvite(input: {
   // Consume the invite so it cannot be reused.
   await prisma.invite.delete({
     where: { id: invite.id },
+  });
+
+  return membership;
+}
+
+/**
+ * Accept an invite by token. Used by the /invite/[token] accept page.
+ *
+ * Validates that the token exists, has not expired, and has not already been
+ * accepted. Creates the membership and marks the invite ACCEPTED.
+ *
+ * MVP rule: a user can only belong to one group, so acceptance is rejected
+ * if the user is already a member of any group.
+ */
+export async function acceptInviteByToken(input: {
+  userId: string;
+  token: string;
+}) {
+  const invite = await prisma.invite.findUnique({
+    where: { token: input.token },
+  });
+
+  if (!invite) {
+    throw new ValidationError("This invite link is invalid or has expired.");
+  }
+
+  if (invite.status === "ACCEPTED") {
+    throw new ValidationError("This invite has already been accepted.");
+  }
+
+  if (invite.expiresAt < new Date()) {
+    throw new ValidationError("This invite link is invalid or has expired.");
+  }
+
+  const existingMembership = await prisma.groupMembership.findFirst({
+    where: { userId: input.userId },
+  });
+
+  if (existingMembership) {
+    throw new ValidationError("You are already a member of a family group.");
+  }
+
+  const membership = await prisma.groupMembership.create({
+    data: {
+      familyGroupId: invite.familyGroupId,
+      userId: input.userId,
+      role: invite.role,
+    },
+  });
+
+  await prisma.invite.update({
+    where: { id: invite.id },
+    data: { status: "ACCEPTED" },
   });
 
   return membership;
