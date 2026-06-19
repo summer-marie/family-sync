@@ -114,27 +114,31 @@ enum Role {
 }
 
 // ---------------------------------------------------------------------------
-// Lightweight invite helper (Step 2 - spec 003)
+// Lightweight invite helper (Step 2 - spec 003, extended Step 7 - spec 007)
 //
 // MVP scope:
-// - Email-based invites with expiry.
-// - Membership is created only when an invited user accepts; invites are not
-//   the source of truth for access.
+// - Email-based invites with expiry and a unique token for accept links.
+// - Membership is created only when an invited user accepts via the token link.
+// - Invites are not the source of truth for access — GroupMembership is.
 // - Duplicate invites for the same email within a group are rejected via the
 //   @@unique([familyGroupId, email]) constraint.
-//
-// v2 upgrade notes:
-// - Add a status enum (PENDING, ACCEPTED, REVOKED) instead of deleting on
-//   acceptance.
-// - Add optional code-based joins alongside email invites.
+// - On acceptance, status is set to ACCEPTED rather than deleting the row,
+//   so the Members page can show invite history.
 // ---------------------------------------------------------------------------
 
+enum InviteStatus {
+  PENDING
+  ACCEPTED
+}
+
 model Invite {
-  id            String     @id @default(cuid())
+  id            String       @id @default(cuid())
   familyGroupId String
   email         String
-  role          Role       @default(MEMBER)
-  createdAt     DateTime   @default(now())
+  role          Role         @default(MEMBER)
+  token         String       @unique @default(cuid())
+  status        InviteStatus @default(PENDING)
+  createdAt     DateTime     @default(now())
   expiresAt     DateTime
 
   familyGroup FamilyGroup @relation(fields: [familyGroupId], references: [id], onDelete: Cascade)

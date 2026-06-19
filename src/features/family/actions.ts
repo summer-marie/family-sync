@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import {
   createFamilyGroup,
+  getMyFamilyGroup,
   inviteMember,
   removeMember,
   AuthorizationError,
@@ -55,11 +56,17 @@ export async function inviteMemberAction(formData: FormData): Promise<void> {
     throw new Error("Invalid request.");
   }
 
+  const inviterName = session.user.name ?? session.user.email ?? "A family member";
+  const familyGroup = await getMyFamilyGroup(session.user.id);
+  const familyName = familyGroup?.name ?? "your family";
+
   try {
     await inviteMember({
       userId: session.user.id,
       familyGroupId,
       email,
+      inviterName,
+      familyName,
     });
   } catch (error) {
     if (error instanceof ValidationError || error instanceof AuthorizationError) {

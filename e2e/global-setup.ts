@@ -19,6 +19,23 @@ const TEST_USER_NAME = 'E2E Test User'
 const PRIVACY_TEST_USER_EMAIL = 'e2e-privacy@family-sync.test'
 const PRIVACY_TEST_USER_NAME = 'E2E Privacy User'
 
+// Invite flow test users (Spec 007).
+// - organizer: pre-seeded with a family group and known invite tokens
+// - recipient: no family group; visits the valid accept link
+// - already-member: pre-seeded in their own family group; tests the
+//   already-in-group error path
+const INVITE_ORGANIZER_EMAIL = 'e2e-invite-organizer@family-sync.test'
+const INVITE_ORGANIZER_NAME = 'E2E Invite Organizer'
+const INVITE_RECIPIENT_EMAIL = 'e2e-invite-recipient@family-sync.test'
+const INVITE_RECIPIENT_NAME = 'E2E Invite Recipient'
+const INVITE_ALREADY_MEMBER_EMAIL = 'e2e-invite-already-member@family-sync.test'
+const INVITE_ALREADY_MEMBER_NAME = 'E2E Already Member User'
+
+// Known tokens pre-seeded so E2E tests can navigate directly to accept URLs.
+const INVITE_TOKEN_VALID = 'e2e-valid-invite-token'
+const INVITE_TOKEN_EXPIRED = 'e2e-expired-invite-token'
+const INVITE_TOKEN_ALREADY_MEMBER = 'e2e-already-member-invite-token'
+
 const AUTH_DIR = path.join(process.cwd(), 'e2e', '.auth')
 
 async function globalSetup() {
@@ -206,6 +223,122 @@ async function globalSetup() {
 
     console.log(`[global-setup] seeded chat test user: ${chatUser.email}`)
     console.log('[global-setup] chat auth state written to e2e/.auth/chat-user.json')
+
+    // -----------------------------------------------------------------------
+    // Email invite test users (Spec 007)
+    // -----------------------------------------------------------------------
+
+    const inviteOrganizer = await prisma.user.upsert({
+      where: { email: INVITE_ORGANIZER_EMAIL },
+      update: {},
+      create: { email: INVITE_ORGANIZER_EMAIL, name: INVITE_ORGANIZER_NAME },
+    })
+
+    // Delete and recreate the organizer's family group each run so invite
+    // tokens are fresh and the recipient's accepted membership is cleared.
+    await prisma.familyGroup.deleteMany({
+      where: { memberships: { some: { userId: inviteOrganizer.id } } },
+    })
+
+    const inviteFamily = await prisma.familyGroup.create({
+      data: {
+        name: 'E2E Invite Family',
+        memberships: { create: { userId: inviteOrganizer.id, role: 'ORGANIZER' } },
+      },
+    })
+
+    // Recipient — no family group allowed (cleared via cascade above if they
+    // accepted a previous run's invite into E2E Invite Family).
+    const inviteRecipient = await prisma.user.upsert({
+      where: { email: INVITE_RECIPIENT_EMAIL },
+      update: {},
+      create: { email: INVITE_RECIPIENT_EMAIL, name: INVITE_RECIPIENT_NAME },
+    })
+
+    // Already-member user — always in their own separate family group.
+    const inviteAlreadyMember = await prisma.user.upsert({
+      where: { email: INVITE_ALREADY_MEMBER_EMAIL },
+      update: {},
+      create: { email: INVITE_ALREADY_MEMBER_EMAIL, name: INVITE_ALREADY_MEMBER_NAME },
+    })
+
+    await prisma.familyGroup.deleteMany({
+      where: { memberships: { some: { userId: inviteAlreadyMember.id } } },
+    })
+
+    await prisma.familyGroup.create({
+      data: {
+        name: 'E2E Already Member Family',
+        memberships: { create: { userId: inviteAlreadyMember.id, role: 'ORGANIZER' } },
+      },
+    })
+
+    // Seed the three known invite tokens for E2E tests.
+    await prisma.invite.create({
+      data: {
+        familyGroupId: inviteFamily.id,
+        email: INVITE_RECIPIENT_EMAIL,
+        token: INVITE_TOKEN_VALID,
+        status: 'PENDING',
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      },
+    })
+
+    await prisma.invite.create({
+      data: {
+        familyGroupId: inviteFamily.id,
+        email: 'e2e-expired-invite@family-sync.test',
+        token: INVITE_TOKEN_EXPIRED,
+        status: 'PENDING',
+        expiresAt: new Date('2020-01-01'),
+      },
+    })
+
+    await prisma.invite.create({
+      data: {
+        familyGroupId: inviteFamily.id,
+        email: INVITE_ALREADY_MEMBER_EMAIL,
+        token: INVITE_TOKEN_ALREADY_MEMBER,
+        status: 'PENDING',
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      },
+    })
+
+    // Sessions for all three invite users.
+    await prisma.session.deleteMany({ where: { userId: inviteOrganizer.id } })
+    const inviteOrganizerToken = randomUUID()
+    const inviteOrganizerExpires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+    await prisma.session.create({
+      data: { sessionToken: inviteOrganizerToken, userId: inviteOrganizer.id, expires: inviteOrganizerExpires },
+    })
+    fs.writeFileSync(
+      path.join(AUTH_DIR, 'invite-organizer.json'),
+      JSON.stringify(buildStorageState(inviteOrganizerToken, inviteOrganizerExpires), null, 2),
+    )
+
+    await prisma.session.deleteMany({ where: { userId: inviteRecipient.id } })
+    const inviteRecipientToken = randomUUID()
+    const inviteRecipientExpires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+    await prisma.session.create({
+      data: { sessionToken: inviteRecipientToken, userId: inviteRecipient.id, expires: inviteRecipientExpires },
+    })
+    fs.writeFileSync(
+      path.join(AUTH_DIR, 'invite-recipient.json'),
+      JSON.stringify(buildStorageState(inviteRecipientToken, inviteRecipientExpires), null, 2),
+    )
+
+    await prisma.session.deleteMany({ where: { userId: inviteAlreadyMember.id } })
+    const inviteAlreadyMemberToken = randomUUID()
+    const inviteAlreadyMemberExpires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+    await prisma.session.create({
+      data: { sessionToken: inviteAlreadyMemberToken, userId: inviteAlreadyMember.id, expires: inviteAlreadyMemberExpires },
+    })
+    fs.writeFileSync(
+      path.join(AUTH_DIR, 'invite-already-member.json'),
+      JSON.stringify(buildStorageState(inviteAlreadyMemberToken, inviteAlreadyMemberExpires), null, 2),
+    )
+
+    console.log('[global-setup] seeded email invite test users and known tokens')
   } finally {
     await prisma.$disconnect()
   }

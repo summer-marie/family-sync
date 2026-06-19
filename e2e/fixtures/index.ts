@@ -57,4 +57,41 @@ export const chatTest = base.extend({
   },
 })
 
+// Invite organizer — pre-seeded with E2E Invite Family and known invite tokens.
+export const inviteOrganizerTest = base.extend({
+  page: async ({ browser }, use) => {
+    const context = await browser.newContext({
+      storageState: path.join(process.cwd(), 'e2e', '.auth', 'invite-organizer.json'),
+    })
+    const page = await context.newPage()
+    await use(page)
+    await context.close()
+  },
+})
+
+// Invite recipient — no family group; visits the valid accept link.
+export const inviteRecipientTest = base.extend({
+  page: async ({ browser }, use) => {
+    const context = await browser.newContext({
+      storageState: path.join(process.cwd(), 'e2e', '.auth', 'invite-recipient.json'),
+    })
+    const page = await context.newPage()
+    await use(page)
+    await context.close()
+  },
+})
+
+// Already-member user — pre-seeded in their own family group; tests the
+// already-in-group error path on the accept page.
+export const inviteAlreadyMemberTest = base.extend({
+  page: async ({ browser }, use) => {
+    const context = await browser.newContext({
+      storageState: path.join(process.cwd(), 'e2e', '.auth', 'invite-already-member.json'),
+    })
+    const page = await context.newPage()
+    await use(page)
+    await context.close()
+  },
+})
+
 export { expect }

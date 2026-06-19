@@ -49,8 +49,9 @@ export default async function FamilyPage() {
     familyGroupId: familyGroup.id,
   });
 
+  // Only show PENDING invites — accepted ones already appear in the Members list.
   const invites = await prisma.invite.findMany({
-    where: { familyGroupId: familyGroup.id },
+    where: { familyGroupId: familyGroup.id, status: "PENDING" },
     orderBy: { createdAt: "asc" },
   });
 
