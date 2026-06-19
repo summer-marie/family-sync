@@ -45,12 +45,14 @@ function buildScheduleSummary(schedule: FamilyScheduleEntry[]): string {
 
   return schedule
     .map((entry) => {
+      const label = entry.name ?? entry.userId;
+
       if (entry.status === "unavailable") {
-        return `${entry.userId}: calendar unavailable`;
+        return `${label}: calendar unavailable`;
       }
 
       if (entry.events.length === 0) {
-        return `${entry.userId}: no events`;
+        return `${label}: no events`;
       }
 
       const eventLines = entry.events
@@ -62,7 +64,7 @@ function buildScheduleSummary(schedule: FamilyScheduleEntry[]): string {
         })
         .join("\n");
 
-      return `${entry.userId}:\n${eventLines}`;
+      return `${label}:\n${eventLines}`;
     })
     .join("\n\n");
 }

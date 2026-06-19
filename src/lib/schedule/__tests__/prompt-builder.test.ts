@@ -85,6 +85,25 @@ describe("buildChatMessages — system prompt", () => {
     expect(system?.content).toContain("Dentist");
   });
 
+  it("uses the member name field in the schedule summary when present", () => {
+    const namedSchedule: FamilyScheduleEntry[] = [
+      { userId: "uuid-123", name: "Alice", status: "connected", events: [] },
+      { userId: "uuid-456", name: "Bob", status: "unavailable", events: [] },
+    ];
+
+    const result = buildChatMessages({
+      familyName: "Doe",
+      schedule: namedSchedule,
+      messages: [{ role: "user", content: "Is anyone free?" }],
+    });
+
+    const system = result.find((m) => m.role === "system");
+    expect(system?.content).toContain("Alice");
+    expect(system?.content).toContain("Bob");
+    expect(system?.content).not.toContain("uuid-123");
+    expect(system?.content).not.toContain("uuid-456");
+  });
+
   it("handles unavailable members without throwing", () => {
     const unavailableSchedule: FamilyScheduleEntry[] = [
       { userId: "carol", status: "unavailable", events: [] },

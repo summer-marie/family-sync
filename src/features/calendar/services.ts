@@ -42,6 +42,7 @@ export type ConnectionStatus = "CONNECTED" | "DISCONNECTED" | "ERROR";
 // "unavailable") from the persisted connection enum (CONNECTED, etc.).
 export type FamilyScheduleEntry = {
   userId: string;
+  name?: string;
   status: "connected" | "unavailable";
   events: ScheduleEvent[];
 };
@@ -245,6 +246,7 @@ export async function getFamilySchedule(input: {
       input.timeMin,
       input.timeMax,
     );
+    entry.name = member.user.name ?? member.user.email ?? member.userId;
     entries.push(entry);
   }
 
