@@ -1,7 +1,7 @@
 "use server";
 
 import { auth } from "@/auth";
-import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import {
   createFamilyGroup,
   inviteMember,
@@ -39,7 +39,7 @@ export async function createFamilyGroupAction(formData: FormData): Promise<void>
     throw error;
   }
 
-  revalidatePath("/family");
+  redirect("/family");
 }
 
 export async function inviteMemberAction(formData: FormData): Promise<void> {
@@ -68,7 +68,7 @@ export async function inviteMemberAction(formData: FormData): Promise<void> {
     throw error;
   }
 
-  revalidatePath("/family");
+  redirect("/family");
 }
 
 export async function removeMemberAction(formData: FormData): Promise<void> {
@@ -97,5 +97,5 @@ export async function removeMemberAction(formData: FormData): Promise<void> {
     throw error;
   }
 
-  revalidatePath("/family");
+  redirect("/family");
 }

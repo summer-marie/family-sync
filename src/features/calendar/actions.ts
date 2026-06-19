@@ -1,7 +1,7 @@
 "use server";
 
 import { auth } from "@/auth";
-import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import {
   createConnection,
@@ -33,7 +33,7 @@ export async function connectCalendarAction(): Promise<void> {
     }
   }
 
-  revalidatePath("/schedule");
+  redirect("/schedule");
 }
 
 /**
@@ -54,5 +54,5 @@ export async function updateVisibility(formData: FormData): Promise<void> {
     data: { visibility },
   });
 
-  revalidatePath("/schedule");
+  redirect("/schedule");
 }
