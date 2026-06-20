@@ -38,8 +38,10 @@ inviteOrganizerTest(
     await page.getByRole('button', { name: /invite/i }).click()
 
     // After submission the page should show the invite as pending.
-    await expect(page.getByText('e2e-new-invite@family-sync.test')).toBeVisible()
-    await expect(page.getByText(/pending/i)).toBeVisible()
+    // Scope to the new invite's row to avoid a strict-mode violation against
+    // the "Pending Invites" heading and other seeded pending rows.
+    const newRow = page.locator('li', { hasText: 'e2e-new-invite@family-sync.test' })
+    await expect(newRow.getByText(/pending/i)).toBeVisible()
   },
 )
 
@@ -123,9 +125,16 @@ inviteAlreadyMemberTest(
     await page.goto(`/invite/${ALREADY_MEMBER_TOKEN}`)
 
     // Should show a clear "already a member" message.
-    await expect(page.getByText(/already.*member|already.*family/i)).toBeVisible()
+    // Scope to the heading to avoid a strict-mode violation against the
+    // descriptive paragraph below it.
+    await expect(
+      page.getByRole('heading', { name: /already.*member/i }),
+    ).toBeVisible()
 
-    // Should provide a link to the user's existing schedule.
-    await expect(page.getByRole('link', { name: /schedule|go to/i })).toBeVisible()
+    // Should provide a link to the user's existing schedule. Scope to main so
+    // this does not also match the nav sidebar's "Schedule" link.
+    await expect(
+      page.getByRole('main').getByRole('link', { name: /schedule|go to/i }),
+    ).toBeVisible()
   },
 )

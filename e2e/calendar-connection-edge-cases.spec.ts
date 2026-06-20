@@ -1,40 +1,49 @@
-import { test, expect } from './fixtures'
+import { calendarErrorTest as test, expect } from './fixtures'
 
-// Spec 002 - Calendar Connection E2E Edge Cases (RED)
+// Spec 002 - Calendar Connection E2E Edge Cases
 //
-// Additional E2E coverage for the calendar-connection feature, added during
-// the TDD coverage review for the feat/calendar-connection branch.
+// Additional E2E coverage for the calendar-connection feature.
 //
-// These tests cover edge cases that require integration-level verification:
-// - Expired token error state shows user-facing error (not a crash)
-// - Reconnecting after a failed connection does not create duplicate records
-// - Overlap indicator rendering when multiple members have busy slots
+// - Expired token error state shows a user-facing error (not a crash)
+//   This test uses a pre-seeded user whose CalendarConnection is in ERROR
+//   status (see global-setup.ts). Because the schedule page reads Google
+//   Calendar server-side — which Playwright route interception cannot reach
+//   — the ERROR connection state is the realistic MVP seam for verifying
+//   the user-facing error contract: a clear notice that the connection
+//   expired plus a reconnect CTA, with no unhandled error boundary.
 //
-// Implementation note: These tests are expected to FAIL (RED) because the
-// UI/mocking layer is out of scope per the task. The tests document the
-// desired behavior for future implementation.
+// - Reconnecting does not create duplicate connection records (still RED)
+// - Overlap indicator rendering (still RED)
+//
+// The latter two remain placeholder tests documenting desired behavior for
+// features not yet built. They are left failing intentionally so the tracking
+// doc reflects real status.
 
 test.describe('Calendar connection - edge cases', () => {
   test('expired token shows user-facing error (not crash)', async ({ page }) => {
-    // This test would require mocking the Google API response at the
-    // network layer (e.g. MSW or Playwright route interception) to return
-    // a 401 or expired token error. With a mocked response, the schedule
-    // page should:
+    // The calendar-error test user is pre-seeded with a CalendarConnection
+    // in ERROR status. The schedule page must:
     // 1. Not crash or show an unhandled error boundary
-    // 2. Display a clear error message ("Your Google Calendar connection expired")
+    // 2. Display a clear error message mentioning the expired connection
     // 3. Offer a reconnect button/CTA
-    //
-    // Without the mocking layer, the live API may succeed or fail.
-    // This RED test asserts the desired error-handling contract.
-
     await page.goto('/schedule')
 
-    // Placeholder assertion - update once error UI exists:
-    // await expect(page.getByText(/expired|reconnect/i)).toBeVisible()
-    // await expect(page.getByRole('heading', { name: /something went wrong/i })).not.toBeVisible()
+    // User-facing error notice about the expired connection. Match the
+    // title line specifically to avoid a strict-mode violation against the
+    // descriptive body line ("Reconnect to share...") which also matches.
+    await expect(
+      page.getByText(/your google calendar connection expired/i),
+    ).toBeVisible()
 
-    // Temporary expectation - will fail until error UI exists:
-    expect(true).toBe(false)
+    // A reconnect CTA must be present.
+    await expect(
+      page.getByRole('button', { name: /connect|reconnect/i }),
+    ).toBeVisible()
+
+    // Must not surface an unhandled error boundary.
+    await expect(
+      page.getByRole('heading', { name: /something went wrong/i }),
+    ).not.toBeVisible()
   })
 
   test('reconnecting does not create duplicate connection records', async ({ page }) => {

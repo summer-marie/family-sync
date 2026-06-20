@@ -86,6 +86,32 @@ async function globalSetup() {
     console.log('[global-setup] auth state written to e2e/.auth/user.json')
 
     // -----------------------------------------------------------------------
+    // Foreign family group (deterministic ID) for cross-group access tests.
+    // The main test user is NOT a member of this group. The chat route's
+    // getFamilySchedule must reject requests targeting this ID with a 403.
+    // A separate "foreign owner" user is the sole member so the group is
+    // realistic and not orphaned.
+    // -----------------------------------------------------------------------
+    const FOREIGN_FAMILY_ID = 'foreign-family-e2e-deterministic-id'
+    const foreignOwner = await prisma.user.upsert({
+      where: { email: 'e2e-foreign-owner@family-sync.test' },
+      update: {},
+      create: { email: 'e2e-foreign-owner@family-sync.test', name: 'E2E Foreign Owner' },
+    })
+
+    // deleteMany is idempotent whether or not the row exists.
+    await prisma.familyGroup.deleteMany({ where: { id: FOREIGN_FAMILY_ID } })
+    await prisma.familyGroup.create({
+      data: {
+        id: FOREIGN_FAMILY_ID,
+        name: 'E2E Foreign Family',
+        memberships: { create: { userId: foreignOwner.id, role: 'ORGANIZER' } },
+      },
+    })
+
+    console.log('[global-setup] seeded foreign family group for cross-group access tests')
+
+    // -----------------------------------------------------------------------
     // Privacy test user (e2e-privacy@family-sync.test)
     // Always has a CalendarConnection with visibility FULL (reset each run)
     // so the visibility toggle is visible from the start of privacy E2E tests.
@@ -125,6 +151,61 @@ async function globalSetup() {
 
     console.log(`[global-setup] seeded privacy test user: ${privacyUser.email}`)
     console.log('[global-setup] privacy auth state written to e2e/.auth/privacy-user.json')
+
+    // -----------------------------------------------------------------------
+    // Calendar-error test user (e2e-calendar-error@family-sync.test)
+    // Pre-seeded with a family group and a CalendarConnection in ERROR
+    // status, so calendar-connection-edge-cases.spec.ts can assert the
+    // schedule page renders a user-facing error notice + reconnect CTA
+    // without needing to mock the server-side Google Calendar call (which
+    // Playwright route interception cannot reach).
+    // -----------------------------------------------------------------------
+    const calendarErrorUser = await prisma.user.upsert({
+      where: { email: 'e2e-calendar-error@family-sync.test' },
+      update: {},
+      create: { email: 'e2e-calendar-error@family-sync.test', name: 'E2E Calendar Error User' },
+    })
+
+    // Clean any prior family group so state is fresh each run.
+    await prisma.familyGroup.deleteMany({
+      where: { memberships: { some: { userId: calendarErrorUser.id } } },
+    })
+
+    await prisma.familyGroup.create({
+      data: {
+        name: 'E2E Calendar Error Family',
+        memberships: { create: { userId: calendarErrorUser.id, role: 'ORGANIZER' } },
+      },
+    })
+
+    // Reset the connection to ERROR on every run.
+    await prisma.calendarConnection.upsert({
+      where: { userId_provider: { userId: calendarErrorUser.id, provider: 'google' } },
+      update: { visibility: 'FULL', status: 'ERROR' },
+      create: {
+        userId: calendarErrorUser.id,
+        provider: 'google',
+        status: 'ERROR',
+        visibility: 'FULL',
+      },
+    })
+
+    await prisma.session.deleteMany({ where: { userId: calendarErrorUser.id } })
+
+    const calendarErrorSessionToken = randomUUID()
+    const calendarErrorExpires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+
+    await prisma.session.create({
+      data: { sessionToken: calendarErrorSessionToken, userId: calendarErrorUser.id, expires: calendarErrorExpires },
+    })
+
+    fs.writeFileSync(
+      path.join(AUTH_DIR, 'calendar-error-user.json'),
+      JSON.stringify(buildStorageState(calendarErrorSessionToken, calendarErrorExpires), null, 2),
+    )
+
+    console.log(`[global-setup] seeded calendar-error test user: ${calendarErrorUser.email}`)
+    console.log('[global-setup] calendar-error auth state written to e2e/.auth/calendar-error-user.json')
 
     // -----------------------------------------------------------------------
     // Notes test user (e2e-notes@family-sync.test)
@@ -260,9 +341,12 @@ async function globalSetup() {
     })
 
     // Already-member user — always in their own separate family group.
+    // Apply the name on update too, so a prior run's row (created with an
+    // older display name that collides with the email-invites :120 regex) is
+    // corrected on every run.
     const inviteAlreadyMember = await prisma.user.upsert({
       where: { email: INVITE_ALREADY_MEMBER_EMAIL },
-      update: {},
+      update: { name: INVITE_ALREADY_MEMBER_NAME },
       create: { email: INVITE_ALREADY_MEMBER_EMAIL, name: INVITE_ALREADY_MEMBER_NAME },
     })
 
