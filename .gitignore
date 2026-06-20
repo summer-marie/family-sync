@@ -55,6 +55,9 @@ e2e/.auth/
 /blob-report/
 /playwright/.cache/
 
+# captured full-suite run output (e.g. from --workers=1 reruns)
+/e2e-full-results.txt
+
 # local TDD logs (RED/GREEN captures per module) — keep on disk, out of git.
 # Track the folder via .gitkeep so it exists after a fresh clone, but ignore
 # the captured output files themselves.

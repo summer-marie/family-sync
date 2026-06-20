@@ -83,6 +83,13 @@ export default async function SchedulePage() {
   const myConnection = await getConnectionForUser(userId);
   const familyGroup = await getMyFamilyGroup(userId);
 
+  // Error state: the viewing user's own connection is in ERROR (e.g. an
+  // expired Google token). Render a user-facing notice with a reconnect CTA
+  // before anything else. The rest of the schedule still renders so the user
+  // can see other members' availability — we degrade gracefully rather than
+  // crashing or hiding the whole page (AGENTS.md).
+  const hasConnectionError = myConnection?.status === "ERROR";
+
   // State 1: no family group
   if (!familyGroup) {
     return (
@@ -90,6 +97,25 @@ export default async function SchedulePage() {
         <h1 className="mb-6 text-2xl font-bold text-primary md:text-3xl">
           Family Schedule
         </h1>
+
+        {hasConnectionError && (
+          <section
+            className="mb-6 rounded-[10px] p-4"
+            style={{
+              backgroundColor: "#1e1b16",
+              border: "1px solid rgba(255, 220, 160, 0.10)",
+            }}
+          >
+            <p className="mb-1 text-sm font-semibold text-amber">
+              Your Google Calendar connection expired
+            </p>
+            <p className="mb-3 text-sm text-secondary">
+              We could not read your calendar. Reconnect to share your
+              availability with your family.
+            </p>
+            <ConnectCalendarButton />
+          </section>
+        )}
 
         {!myConnection && (
           <section
@@ -175,6 +201,25 @@ export default async function SchedulePage() {
         Family Schedule
       </h1>
       <p className="mb-6 text-sm text-secondary">{familyGroup.name}</p>
+
+      {hasConnectionError && (
+        <section
+          className="mb-6 rounded-[10px] p-4"
+          style={{
+            backgroundColor: "#1e1b16",
+            border: "1px solid rgba(255, 220, 160, 0.10)",
+          }}
+        >
+          <p className="mb-1 text-sm font-semibold text-amber">
+            Your Google Calendar connection expired
+          </p>
+          <p className="mb-3 text-sm text-secondary">
+            We could not read your calendar. Reconnect to share your
+            availability with your family.
+          </p>
+          <ConnectCalendarButton />
+        </section>
+      )}
 
       {!myConnection && (
         <section

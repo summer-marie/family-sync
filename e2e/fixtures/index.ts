@@ -57,6 +57,20 @@ export const chatTest = base.extend({
   },
 })
 
+// Calendar-error test user — pre-seeded with an ERROR CalendarConnection
+// and a family group. Used by calendar-connection-edge-cases.spec.ts to
+// assert the schedule page renders a user-facing error notice + reconnect CTA.
+export const calendarErrorTest = base.extend({
+  page: async ({ browser }, use) => {
+    const context = await browser.newContext({
+      storageState: path.join(process.cwd(), 'e2e', '.auth', 'calendar-error-user.json'),
+    })
+    const page = await context.newPage()
+    await use(page)
+    await context.close()
+  },
+})
+
 // Invite organizer — pre-seeded with E2E Invite Family and known invite tokens.
 export const inviteOrganizerTest = base.extend({
   page: async ({ browser }, use) => {

@@ -99,38 +99,39 @@ test.describe.serial('Family group management', () => {
 // ---------------------------------------------------------------------------
 
 test.describe('Cross-group access restriction', () => {
-  test('user cannot view another family group schedule', async ({ page, browser }) => {
-    // Setup: A fresh context representing a user who is NOT a member of the
-    // E2E Test Family. In a real implementation, global-setup would seed
-    // a second family/group and this test would navigate to that schedule.
+  test('user cannot view another family group schedule', async ({ page }) => {
+    // The main test user (e2e-test@family-sync.test) is NOT a member of the
+    // pre-seeded foreign family group (deterministic ID in global-setup).
+    // The chat route's getFamilySchedule must reject this request fail-closed
+    // with a 403 rather than exposing the foreign family's schedule data.
     //
-    // For now, the schedule page does not exist, so this test is expected to
-    // fail (RED) until the route exists.
+    // This verifies the full request/response authorization path end-to-end
+    // without inventing URL-based navigation the product does not have.
+    const FOREIGN_FAMILY_ID = 'foreign-family-e2e-deterministic-id'
 
-    await page.goto('/schedule')
+    const response = await page.request.post('/api/chat', {
+      data: {
+        messages: [{ role: 'user', content: 'who is free this week?' }],
+        familyGroupId: FOREIGN_FAMILY_ID,
+        familyName: 'E2E Foreign Family',
+      },
+    })
 
-    // Expected behavior: If the user is not a member of the requested family,
-    // the route should return 403 or redirect (not expose schedule data).
-    //
-    // Placeholder assertion - update once schedule route exists:
-    // await expect(page).toHaveURL(/403|forbidden|not.*member/i)
-
-    // Temporary expectation - will fail until schedule route exists:
-    expect(true).toBe(false)
+    expect(response.status()).toBe(403)
+    expect(await response.text()).toBe('Forbidden')
   })
 
   test('member list updates after adding a new member', async ({ page }) => {
     // After inviting a member (covered by the serial flow above), the members
-    // list should refresh to show the new pending/active member. This tests
-    // that the UI reacts to data changes rather than requiring a full reload.
+    // page should refresh to show the new pending invite. This tests that the
+    // UI reacts to data changes rather than requiring a full reload.
 
     await page.goto('/family')
 
-    // Expected: The invited member should appear in the members section
-    // Placeholder - update once invite flow exists:
-    // await expect(page.getByText('invited-member@example.com')).toBeVisible()
-
-    // Temporary expectation - will fail until invite flow exists:
-    expect(true).toBe(false)
+    // The invited email from the earlier serial test should appear in the
+    // Pending Invites section. Scope to main to avoid matching nav elements.
+    await expect(
+      page.getByRole('main').getByText('invited-member@example.com'),
+    ).toBeVisible()
   })
 })

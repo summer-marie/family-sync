@@ -16,6 +16,7 @@ export function InviteForm({ familyGroupId }: { familyGroupId: string }) {
         <input
           type="email"
           name="email"
+          aria-label="Email address"
           placeholder="Email address"
           className="flex-1 rounded-lg px-3 py-2 text-sm text-primary placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-amber/40"
           style={{
