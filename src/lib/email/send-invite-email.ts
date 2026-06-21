@@ -21,8 +21,13 @@ This link expires in 7 days.
 
 If you did not expect this invitation, you can ignore this email.`;
 
+  const from = process.env.RESEND_FROM_EMAIL;
+  if (!from) {
+    throw new Error("RESEND_FROM_EMAIL is not set");
+  }
+
   await resend.emails.send({
-    from: process.env.RESEND_FROM_EMAIL ?? "onboarding@resend.dev",
+    from,
     to,
     subject: `You have been invited to join ${familyName} on Family Sync`,
     text,
