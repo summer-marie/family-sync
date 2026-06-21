@@ -224,8 +224,14 @@ export async function inviteMember(input: {
   });
 
   // Send invite email. Failure is non-fatal — log and continue.
-  const acceptUrl = `${process.env.NEXTAUTH_URL ?? "http://localhost:3000"}/invite/${invite.token}`;
+  // NEXTAUTH_URL must be set explicitly (.env.local for dev, Vercel env for prod);
+  // no code-level fallback so a misconfigured deploy fails loudly here, not silently.
   try {
+    const baseUrl = process.env.NEXTAUTH_URL;
+    if (!baseUrl) {
+      throw new Error("NEXTAUTH_URL is not set");
+    }
+    const acceptUrl = `${baseUrl}/invite/${invite.token}`;
     await sendInviteEmail({
       to: input.email,
       inviterName: input.inviterName ?? "A family member",
