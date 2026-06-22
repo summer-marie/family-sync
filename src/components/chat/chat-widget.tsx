@@ -1,6 +1,37 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import ReactMarkdown from "react-markdown";
+
+// Minimal element styling so markdown (bold, lists, headings) reads cleanly
+// inside the chat bubble's existing dark theme, without pulling in a full
+// typography plugin.
+const markdownComponents = {
+  p: (props: React.ComponentPropsWithoutRef<"p">) => (
+    <p className="mb-2 last:mb-0" {...props} />
+  ),
+  strong: (props: React.ComponentPropsWithoutRef<"strong">) => (
+    <strong className="font-semibold text-primary" {...props} />
+  ),
+  ul: (props: React.ComponentPropsWithoutRef<"ul">) => (
+    <ul className="mb-2 list-disc space-y-1 pl-5 last:mb-0" {...props} />
+  ),
+  ol: (props: React.ComponentPropsWithoutRef<"ol">) => (
+    <ol className="mb-2 list-decimal space-y-1 pl-5 last:mb-0" {...props} />
+  ),
+  li: (props: React.ComponentPropsWithoutRef<"li">) => (
+    <li {...props} />
+  ),
+  h1: (props: React.ComponentPropsWithoutRef<"h1">) => (
+    <p className="mb-1 font-semibold text-primary" {...props} />
+  ),
+  h2: (props: React.ComponentPropsWithoutRef<"h2">) => (
+    <p className="mb-1 font-semibold text-primary" {...props} />
+  ),
+  h3: (props: React.ComponentPropsWithoutRef<"h3">) => (
+    <p className="mb-1 font-semibold text-primary" {...props} />
+  ),
+};
 
 // Mirrors FamilyScheduleEntry / ScheduleEvent from services.ts — defined here
 // to avoid importing from a server-only module in a client component.
@@ -29,6 +60,13 @@ type Props = {
 };
 
 const MAX_TEXTAREA_HEIGHT = 120; // ~5 lines
+
+// Hard ceiling on rendered response length. Protects the browser from any
+// runaway/oversized stream — regardless of why the server sent it — since
+// appending unbounded text on every chunk via setState can freeze the tab
+// before a server-side fix would ever have a chance to help.
+const MAX_RESPONSE_CHARS = 4000;
+const TRUNCATION_NOTICE = "\n\n[Response truncated — please rephrase your question.]";
 
 export function ChatWidget({ familyGroupId, familyName, schedule }: Props) {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -99,6 +137,15 @@ export function ChatWidget({ familyGroupId, familyName, schedule }: Props) {
         const { done, value } = await reader.read();
         if (done) break;
         accumulated += decoder.decode(value, { stream: true });
+
+        if (accumulated.length > MAX_RESPONSE_CHARS) {
+          accumulated =
+            accumulated.slice(0, MAX_RESPONSE_CHARS) + TRUNCATION_NOTICE;
+          setStreamingContent(accumulated);
+          await reader.cancel();
+          break;
+        }
+
         setStreamingContent(accumulated);
       }
 
@@ -167,7 +214,9 @@ export function ChatWidget({ familyGroupId, familyName, schedule }: Props) {
                   color: "#c8bfb0",
                 }}
               >
-                {msg.content}
+                <ReactMarkdown components={markdownComponents}>
+                  {msg.content}
+                </ReactMarkdown>
               </div>
             </div>
           )
@@ -220,7 +269,9 @@ export function ChatWidget({ familyGroupId, familyName, schedule }: Props) {
                 color: "#c8bfb0",
               }}
             >
-              {streamingContent}
+              <ReactMarkdown components={markdownComponents}>
+                {streamingContent}
+              </ReactMarkdown>
             </div>
           </div>
         )}
