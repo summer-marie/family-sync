@@ -34,7 +34,7 @@ export default async function FamilyPage() {
   if (!familyGroup) {
     return (
       <main className="mx-auto max-w-2xl px-4 py-8">
-        <h1 className="mb-6 text-2xl font-bold text-primary md:text-3xl">
+        <h1 className="mb-6 text-center text-2xl font-bold text-primary md:text-3xl">
           Set up your group
         </h1>
         <CreateFamilyForm />
@@ -59,7 +59,7 @@ export default async function FamilyPage() {
 
   return (
     <main className="mx-auto max-w-2xl px-4 py-8">
-      <h1 className="mb-6 text-2xl font-bold text-primary md:text-3xl">
+      <h1 className="mb-6 text-center text-2xl font-bold text-primary md:text-3xl">
         {familyGroup.name}
       </h1>
 

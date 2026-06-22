@@ -26,8 +26,8 @@ export default async function NotesPage() {
   if (!familyGroup) {
     return (
       <main className="mx-auto max-w-2xl px-4 py-8">
-        <h1 className="mb-6 text-2xl font-bold text-primary md:text-3xl">
-          Family Notes
+        <h1 className="mb-6 text-center text-2xl font-bold text-primary md:text-3xl">
+          Shared Notes
         </h1>
         <p className="text-sm text-secondary">
           <a href="/family" className="text-amber underline hover:text-amber-hover">
@@ -45,50 +45,58 @@ export default async function NotesPage() {
   });
 
   return (
-    <main className="mx-auto max-w-2xl px-4 py-8">
-      <h1 className="mb-1 text-2xl font-bold text-primary md:text-3xl">
-        Family Notes
+    <main className="mx-auto px-4 py-8 lg:max-w-6xl">
+      <h1 className="mb-1 text-center text-2xl font-bold text-primary md:text-3xl">
+        Shared Notes
       </h1>
-      <p className="mb-6 text-sm text-secondary">{familyGroup.name}</p>
+      <p className="mb-6 text-center text-sm text-secondary">{familyGroup.name}</p>
 
-      <section className="mb-8">
-        <h2 className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted">
-          Notes
-        </h2>
-        {notes.length === 0 ? (
-          <p className="text-sm italic text-muted">No notes yet.</p>
-        ) : (
-          <ul className="space-y-3">
-            {notes.map((note) => {
-              const authorName = note.updatedBy.name ?? note.updatedBy.email ?? "Unknown";
-              return (
-                <li
-                  key={note.id}
-                  className="rounded-[0.625rem] p-4"
-                  style={{
-                    backgroundColor: "#1e1b16",
-                    border: "1px solid rgba(255, 220, 160, 0.10)",
-                  }}
-                >
-                  <p className="mb-2 whitespace-pre-wrap text-sm text-secondary">
-                    {note.content}
-                  </p>
-                  <p className="text-xs text-muted">
-                    {authorName} — {note.createdAt.toLocaleString()}
-                  </p>
-                </li>
-              );
-            })}
-          </ul>
-        )}
-      </section>
+      {/* Desktop: two-column layout matching /schedule — fixed-width left
+          column for the add-note form, flexible right column for the
+          scrollable list of cards. Mobile keeps the original stacked
+          single column (unchanged below lg). */}
+      <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
+        <section className="lg:w-[28.75rem] lg:shrink-0">
+          <h2 className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted">
+            Add a note
+          </h2>
+          <NotesForm familyGroupId={familyGroup.id} />
+        </section>
 
-      <section>
-        <h2 className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted">
-          Add a note
-        </h2>
-        <NotesForm familyGroupId={familyGroup.id} />
-      </section>
+        <section className="min-w-0 flex-1">
+          <h2 className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted">
+            Notes
+          </h2>
+          {notes.length === 0 ? (
+            <p className="text-sm italic text-muted">No notes yet.</p>
+          ) : (
+            <ul className="space-y-3">
+              {notes.map((note) => {
+                const authorName =
+                  note.updatedBy.name ?? note.updatedBy.email ?? "Unknown";
+                return (
+                  <li
+                    key={note.id}
+                    className="rounded-[0.625rem] p-4"
+                    style={{
+                      backgroundColor: "#1e1b16",
+                      border: "1px solid rgba(212, 168, 83, 0.30)",
+                      borderLeft: "3px solid #d4a853",
+                    }}
+                  >
+                    <p className="mb-2 whitespace-pre-wrap text-sm text-secondary">
+                      {note.content}
+                    </p>
+                    <p className="text-xs text-muted">
+                      {authorName} — {note.createdAt.toLocaleString()}
+                    </p>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </section>
+      </div>
     </main>
   );
 }
