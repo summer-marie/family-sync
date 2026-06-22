@@ -57,3 +57,13 @@
 .schedule-scroll::-webkit-scrollbar-thumb:hover {
   background-color: #e8c97a;
 }
+
+/* Chat input — auto-grows up to its max height; scrolling past that point
+   stays functional but invisible, matching a typical messaging app input. */
+.chat-input-scroll {
+  scrollbar-width: none;
+}
+
+.chat-input-scroll::-webkit-scrollbar {
+  display: none;
+}

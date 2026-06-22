@@ -256,7 +256,7 @@ export function ChatWidget({ familyGroupId, familyName, schedule }: Props) {
           placeholder="Ask a question about the schedule"
           disabled={isStreaming}
           rows={1}
-          className="flex-1 resize-none overflow-y-auto rounded-lg px-3 py-2 text-sm text-primary placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-ai/60 disabled:opacity-50"
+          className="chat-input-scroll flex-1 resize-none overflow-y-auto rounded-lg px-3 py-2 text-sm text-primary placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-ai/60 disabled:opacity-50"
           style={{
             backgroundColor: "#1e1b16",
             border: "1px solid rgba(124, 92, 191, 0.30)",
