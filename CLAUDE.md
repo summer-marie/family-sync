@@ -96,7 +96,7 @@ This repo is explicitly spec-driven and TDD-oriented. For feature work and behav
 
 If a task touches an existing spec, align the work with that spec before coding. If the requested work appears to conflict with a spec or the documented TDD workflow, stop and call out the mismatch.
 
-When TDD is in effect for a piece of work, Claude must follow the Required Checkpoint Sequence in `docs/tdd-workflow.md` exactly — summarize the proposed change and wait for approval, write failing tests only, run and confirm RED, stop and provide a commit message, wait for the user to commit, then implement, confirm GREEN, stop and provide a commit message. Do not skip, merge, or run ahead of these stop points.
+When TDD is in effect for a piece of work, Claude must follow the Required Checkpoint Sequence in `docs/tdd-workflow.md` exactly — summarize the proposed change and wait for approval, write failing tests only, run and confirm RED, capture a numbered log in `docs/tdd/logs/` and update `test-tracking.md` without being asked, stop and provide a commit message, wait for the user to commit, then implement, confirm GREEN, capture the GREEN log and update `test-tracking.md` again, stop and provide a commit message. Do not skip, merge, or run ahead of these stop points.
 
 ## Working Style
 
