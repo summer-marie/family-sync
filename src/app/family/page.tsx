@@ -189,8 +189,8 @@ export default async function FamilyPage() {
         </section>
       )}
 
-      {/* Invite form — organizer only */}
-      {isOrganizer && (
+      {/* Invite form — any member of the group */}
+      {currentMember && (
         <section className="mb-8">
           <h2 className="mb-3 text-lg font-semibold text-primary">
             Invite a member

@@ -168,8 +168,8 @@ export async function getFamilyGroupMembers(input: {
 }
 
 /**
- * Create an email-based invite for a family group. Only the organizer can
- * invite. Duplicate invites (same email in the same group) are rejected.
+ * Create an email-based invite for a family group. Any member of the group
+ * can invite. Duplicate invites (same email in the same group) are rejected.
  *
  * After creating the invite, sends an email via Resend. If the email send
  * fails, the error is logged but not re-thrown — the invite record still
@@ -184,7 +184,7 @@ export async function inviteMember(input: {
 }) {
   validateEmail(input.email);
 
-  await assertMembership(input.userId, input.familyGroupId, true);
+  await assertMembership(input.userId, input.familyGroupId);
 
   // Check for an existing pending invite for this email in this group.
   const existingInvite = await prisma.invite.findFirst({
