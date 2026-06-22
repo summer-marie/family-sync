@@ -39,7 +39,12 @@ const prisma = _prisma as unknown as {
   };
 };
 
-import { saveNote, listNotes, AuthorizationError } from "@/features/notes/services";
+import {
+  saveNote,
+  listNotes,
+  AuthorizationError,
+  ValidationError,
+} from "@/features/notes/services";
 
 const mockMembership = {
   id: "mem-1",
@@ -106,6 +111,20 @@ describe("notes service", () => {
       await expect(
         saveNote({ userId: "user-99", familyGroupId: "group-1", content: "Hello" }),
       ).rejects.toThrow(AuthorizationError);
+
+      expect(prisma.sharedNote.create).not.toHaveBeenCalled();
+    });
+
+    it("content over 500 characters is rejected with ValidationError", async () => {
+      prisma.groupMembership.findFirst.mockResolvedValue(mockMembership);
+
+      await expect(
+        saveNote({
+          userId: "user-1",
+          familyGroupId: "group-1",
+          content: "a".repeat(501),
+        }),
+      ).rejects.toThrow(ValidationError);
 
       expect(prisma.sharedNote.create).not.toHaveBeenCalled();
     });
