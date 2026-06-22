@@ -332,18 +332,19 @@ describe("inviteMember", () => {
     expect(prisma.invite.create).not.toHaveBeenCalled();
   });
 
-  it("rejects invitation when the caller is a MEMBER, not ORGANIZER", async () => {
-    prisma.groupMembership.findFirst.mockResolvedValue(mockMemberMembership);
+  it("allows a MEMBER (not just the ORGANIZER) to send an invite", async () => {
+    prisma.groupMembership.findFirst
+      .mockResolvedValueOnce(mockMemberMembership)
+      .mockResolvedValueOnce(null);
 
-    await expect(
-      inviteMember({
-        userId: mockOtherUser.id,
-        familyGroupId: "family-1",
-        email: "newperson@example.com",
-      }),
-    ).rejects.toThrow(AuthorizationError);
+    const result = await inviteMember({
+      userId: mockOtherUser.id,
+      familyGroupId: "family-1",
+      email: "newperson@example.com",
+    });
 
-    expect(prisma.invite.create).not.toHaveBeenCalled();
+    expect(prisma.invite.create).toHaveBeenCalledOnce();
+    expect(result.email).toBe("newperson@example.com");
   });
 
   it("rejects inviting an email that is already a group member", async () => {

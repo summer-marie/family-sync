@@ -40,16 +40,13 @@ async function assertMembership(
 // ---------------------------------------------------------------------------
 
 /**
- * Create or update the shared note for a family group.
- *
- * MVP rule: one note per family group, enforced by the @unique constraint on
- * familyGroupId in the SharedNote model. saveNote upserts so callers do not
- * need to distinguish create from update.
+ * Create a new shared note card for a family group. A family group can have
+ * many notes — each save adds a new note rather than overwriting a prior one.
  *
  * Authorization: the caller must be a member of the family group. Non-members
  * are rejected with AuthorizationError (fail closed per AGENTS.md).
  *
- * Empty content is accepted — clearing the note is a valid action.
+ * Empty content is accepted — an empty note is a valid card.
  */
 export async function saveNote(input: {
   userId: string;
@@ -58,16 +55,30 @@ export async function saveNote(input: {
 }) {
   await assertMembership(input.userId, input.familyGroupId);
 
-  return prisma.sharedNote.upsert({
-    where: { familyGroupId: input.familyGroupId },
-    create: {
+  return prisma.sharedNote.create({
+    data: {
       familyGroupId: input.familyGroupId,
       content: input.content,
       updatedByUserId: input.userId,
     },
-    update: {
-      content: input.content,
-      updatedByUserId: input.userId,
-    },
+  });
+}
+
+/**
+ * List all shared note cards for a family group, newest first.
+ *
+ * Authorization: the caller must be a member of the family group. Non-members
+ * are rejected with AuthorizationError (fail closed per AGENTS.md).
+ */
+export async function listNotes(input: {
+  userId: string;
+  familyGroupId: string;
+}) {
+  await assertMembership(input.userId, input.familyGroupId);
+
+  return prisma.sharedNote.findMany({
+    where: { familyGroupId: input.familyGroupId },
+    orderBy: { createdAt: "desc" },
+    include: { updatedBy: { select: { name: true, email: true } } },
   });
 }

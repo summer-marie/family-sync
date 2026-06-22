@@ -7,7 +7,6 @@ import { prisma } from "@/lib/prisma";
 import { CreateFamilyForm } from "@/components/family/create-family-form";
 import { InviteForm } from "@/components/family/invite-form";
 import { RemoveMemberButton } from "@/components/family/remove-member-button";
-import { NotesForm } from "@/components/notes/notes-form";
 
 // ---------------------------------------------------------------------------
 // /family page - server component
@@ -53,10 +52,6 @@ export default async function FamilyPage() {
   const invites = await prisma.invite.findMany({
     where: { familyGroupId: familyGroup.id, status: "PENDING" },
     orderBy: { createdAt: "asc" },
-  });
-
-  const sharedNote = await prisma.sharedNote.findUnique({
-    where: { familyGroupId: familyGroup.id },
   });
 
   const currentMember = members.find((m) => m.userId === userId);
@@ -134,17 +129,6 @@ export default async function FamilyPage() {
             );
           })}
         </ul>
-      </section>
-
-      {/* Shared notes */}
-      <section
-        className="pt-8"
-        style={{ borderTop: "1px solid rgba(255, 220, 160, 0.10)" }}
-      >
-        <h2 className="mb-3 text-lg font-semibold text-primary">
-          Schedule Notes
-        </h2>
-        <NotesForm familyGroupId={familyGroup.id} />
       </section>
 
       {/* Pending invites section */}

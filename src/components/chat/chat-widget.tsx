@@ -180,7 +180,7 @@ export function ChatWidget({ familyGroupId, familyName, schedule }: Props) {
   return (
     <section
       aria-label="AI Schedule Chat"
-      className="mt-10 flex flex-col rounded-[0.625rem] p-6 lg:mt-0 lg:h-[34rem]"
+      className="mt-10 flex flex-col rounded-[0.625rem] p-6 lg:mt-0 lg:h-136"
       style={{
         background:
           "linear-gradient(135deg, #1e1510 0%, #1a1520 50%, #141020 100%)",

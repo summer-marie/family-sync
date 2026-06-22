@@ -84,7 +84,7 @@ model FamilyGroup {
   updatedAt   DateTime         @updatedAt
   memberships GroupMembership[]
   invites     Invite[]
-  sharedNote  SharedNote?
+  sharedNotes SharedNote[]
 
   @@map("family_group")
 }
@@ -214,8 +214,9 @@ enum Visibility {
 
 model SharedNote {
   id              String   @id @default(cuid())
-  familyGroupId   String   @unique
+  familyGroupId   String
   content         String   @default("")
+  createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
   updatedByUserId String
 

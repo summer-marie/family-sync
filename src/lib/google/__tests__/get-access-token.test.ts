@@ -34,7 +34,12 @@ describe("getGoogleAccessToken", () => {
     expect(prisma.account.findFirst).toHaveBeenCalledWith(
       expect.objectContaining({
         where: { userId: "user-1", provider: "google" },
-        select: { access_token: true },
+        select: {
+          id: true,
+          access_token: true,
+          refresh_token: true,
+          expires_at: true,
+        },
       }),
     );
   });
@@ -79,7 +84,12 @@ describe("getGoogleAccessToken", () => {
     expect(result).toBe("token");
     expect(prisma.account.findFirst).toHaveBeenCalledWith(
       expect.objectContaining({
-        select: { access_token: true },
+        select: {
+          id: true,
+          access_token: true,
+          refresh_token: true,
+          expires_at: true,
+        },
       }),
     );
   });
