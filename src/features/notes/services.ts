@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 //
 // AuthorizationError: thrown when a user is not a member of the family group
 //   whose note is being accessed. The service always fails closed per AGENTS.md.
+// ValidationError: thrown when input is invalid (content too long).
 // ---------------------------------------------------------------------------
 
 export class AuthorizationError extends Error {
@@ -16,9 +17,26 @@ export class AuthorizationError extends Error {
   }
 }
 
+export class ValidationError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "ValidationError";
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
+
+const MAX_NOTE_LENGTH = 500;
+
+function validateContentLength(content: string): void {
+  if (content.length > MAX_NOTE_LENGTH) {
+    throw new ValidationError(
+      `Note content must be ${MAX_NOTE_LENGTH} characters or fewer.`,
+    );
+  }
+}
 
 async function assertMembership(
   userId: string,
@@ -54,6 +72,7 @@ export async function saveNote(input: {
   content: string;
 }) {
   await assertMembership(input.userId, input.familyGroupId);
+  validateContentLength(input.content);
 
   return prisma.sharedNote.create({
     data: {
