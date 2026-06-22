@@ -45,14 +45,14 @@ I am building this project by myself, so I need the scope to stay realistic, tes
 As a family member, I want to create an account, sign in, and securely access my family space so that only authorized people can view shared calendar information.
 
 **US-2**  
-As a family organizer, I want to create a family group and invite specific members so that the right people can join the shared hub.
+As a family organizer, I want to create a family group so that I can start a shared hub for my family. As any member of that group, I want to invite additional people by email so that the right people can join — invite ability is not limited to the organizer.
 
 **US-3**  
 As a family member, I want to view the current members of my family group so that I know who is included in the shared schedule and notes.
 
 #### Epic 2: Calendar Sharing and Visibility
 **US-4**  
-As a family member, I want to connect my Google Calendar so that my availability can be included in the family schedule.
+As a family member, I want to connect my Google Calendar so that my availability can be included in the family schedule, and have my connection stay valid automatically without needing to manually reconnect for routine token expiry.
 
 **US-5**  
 As a family organizer, I want to view a combined family schedule so that I can quickly understand conflicts, overlaps, and open time.
@@ -65,18 +65,22 @@ As a privacy-conscious family member, I want control over whether my event title
 As a family member, I want to ask natural-language questions about the family schedule so that I can get quick answers without manually comparing calendars.
 
 **US-8**  
-As a family member, I want to create and edit shared family notes so that important reminders and planning details stay in one place.
+As a family member, I want to add notes to a shared space that every member of my family group can see, so that reminders and planning details stay in one place. Notes are added as individual cards, attributed to whoever wrote them.
 
 **US-9**  
-As a family organizer, I want to update or delete the family group and manage membership when needed so that the shared space stays accurate over time.
+As a family organizer, I want to remove a member from the family group when needed so that the shared space stays accurate over time.
+
+#### Epic 4: Trust and Transparency
+**US-16**  
+As a user, I want to read an FAQ and a clear privacy explanation so that I understand what data is collected, what the AI assistant can and can't see, and how to control my own visibility.
 
 ### Should Have
 
 **US-10**  
-As a family member, I want a clear reconnection flow if my Google Calendar disconnects so that my schedule can be restored without confusion.
+As a family member, if my Google access is fully revoked (not just routinely expired), I want a clear reconnection prompt so that my schedule can be restored without confusion.
 
 **US-11**  
-As a family organizer, I want basic group settings such as renaming the group so that the shared space stays current.
+As a family organizer, I want basic group settings such as renaming or deleting the group so that the shared space stays current.
 
 ### Could Have
 
@@ -104,8 +108,9 @@ As a user, I want fully autonomous AI scheduling and editing, but this will not 
 - Users can only access the family data they are authorized to see.
 
 #### US-2 — Family Group Creation
-- An authenticated user can create a family group.
-- A family organizer can invite members by email.
+- An authenticated user can create a family group and becomes its organizer.
+- Any member of the group, not just the organizer, can invite additional members by email.
+- A member cannot invite their own email address.
 - Group members can view the current list of members.
 
 #### US-3 — Group Membership View
@@ -115,7 +120,8 @@ As a user, I want fully autonomous AI scheduling and editing, but this will not 
 #### US-4 — Google Calendar Connection
 - A user can connect their Google Calendar successfully.
 - The app stores the connection so the user does not need to reconnect every session.
-- If the connection fails or expires, the user is informed clearly.
+- An expired access token is refreshed automatically in the background using the stored refresh token, with no user-facing reconnect step.
+- If access is fully revoked (refresh fails), the user is informed clearly and prompted to reconnect.
 
 #### US-5 — Combined Schedule View
 - The app shows a shared family schedule using connected calendars.
@@ -132,13 +138,16 @@ As a user, I want fully autonomous AI scheduling and editing, but this will not 
 - The AI stays within allowed scope and does not take unsupported actions.
 
 #### US-8 — Shared Family Notes
-- Group members can create and edit a shared note.
-- Unauthorized users cannot access the shared note.
+- Any group member can add a note, shown as its own card to the whole group.
+- Each note is attributed to the member who wrote it.
+- Unauthorized users cannot access the group's notes.
 
-#### US-9 — Group Update and Deletion
-- A family organizer can rename the group.
-- A family organizer can remove a member.
-- A family organizer can delete the group with confirmation.
+#### US-9 — Member Removal
+- A family organizer can remove a member from the group.
+
+#### US-16 — Trust and Transparency
+- An FAQ page explains core app behavior in plain language.
+- A privacy page explains what data is collected, what is not stored (calendar events), and how the AI assistant's access is limited by each member's visibility setting.
 
 ### If Time Permits / Still Undecided
 
@@ -178,10 +187,10 @@ This feature allows a family member to choose whether their event titles are sho
 - Edge cases: setting changes after data is already loaded, hidden titles in AI answers, mixed visibility across group members.
 
 #### Shared Family Notes
-This feature gives the family one shared note space for reminders, plans, or coordination details that belong alongside the calendar hub. It is part of the MVP, but it is a supporting feature rather than the main differentiator of the app.
+This feature gives the family a shared notes space for reminders, plans, or coordination details that belong alongside the calendar hub. Each note is its own card, attributed to its author, with the full history visible to the group rather than a single note that gets overwritten. It is part of the MVP, but it is a supporting feature rather than the main differentiator of the app.
 
-- Key data: SharedNote, group association, editor access.
-- Edge cases: empty note content, unauthorized access, concurrent edits kept simple for MVP.
+- Key data: SharedNote (one row per note), group association, author.
+- Edge cases: empty note content, unauthorized access. Editing or deleting an individual note after it's posted is not supported for MVP.
 
 ### If Time Permits
 

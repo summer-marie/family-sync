@@ -36,14 +36,14 @@ I do not want to manage the whole family calendar system; I just want quick answ
 As a family member, I want to create an account, sign in, and securely access my family space so that only authorized people can view shared calendar information.
 
 **US-2**  
-As a family organizer, I want to create a family group and invite specific members so that the right people can join the shared hub.
+As a family organizer, I want to create a family group so that I can start a shared hub for my family. As any member of that group, I want to invite additional people by email so that the right people can join — invite ability is not limited to the organizer.
 
 **US-3**  
 As a family member, I want to view the current members of my family group so that I know who is included in the shared schedule and notes.
 
 #### Epic 2: Calendar Sharing and Visibility
 **US-4**  
-As a family member, I want to connect my Google Calendar so that my availability can be included in the family schedule.
+As a family member, I want to connect my Google Calendar so that my availability can be included in the family schedule, and have my connection stay valid automatically without needing to manually reconnect for routine token expiry.
 
 **US-5**  
 As a family organizer, I want to view a combined family schedule so that I can quickly understand conflicts, overlaps, and open time.
@@ -56,18 +56,22 @@ As a privacy-conscious family member, I want control over whether my event title
 As a family member, I want to ask natural-language questions about the family schedule so that I can get quick answers without manually comparing calendars.
 
 **US-8**  
-As a family member, I want to create and edit shared family notes so that important reminders and planning details stay in one place.
+As a family member, I want to add notes to a shared space that every member of my family group can see, so that reminders and planning details stay in one place. Notes are added as individual cards, attributed to whoever wrote them.
 
 **US-9**  
-As a family organizer, I want to update or delete the family group and manage membership when needed so that the shared space stays accurate over time.
+As a family organizer, I want to remove a member from the family group when needed so that the shared space stays accurate over time.
+
+#### Epic 4: Trust and Transparency
+**US-16**  
+As a user, I want to read an FAQ and a clear privacy explanation so that I understand what data is collected, what the AI assistant can and can't see, and how to control my own visibility.
 
 ### Should Have
 
 **US-10**  
-As a family member, I want a clear reconnection flow if my Google Calendar disconnects so that my schedule can be restored without confusion.
+As a family member, if my Google access is fully revoked (not just routinely expired), I want a clear reconnection prompt so that my schedule can be restored without confusion.
 
 **US-11**  
-As a family organizer, I want basic group settings such as renaming the group so that the shared space stays current.
+As a family organizer, I want basic group settings such as renaming or deleting the group so that the shared space stays current.
 
 ### Could Have
 

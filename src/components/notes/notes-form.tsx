@@ -1,27 +1,33 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface NotesFormProps {
   familyGroupId: string;
 }
 
 export function NotesForm({ familyGroupId }: NotesFormProps) {
+  const router = useRouter();
   const [content, setContent] = useState("");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
   async function handleSave() {
     setSaving(true);
-    await fetch("/api/notes", {
+    const res = await fetch("/api/notes", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ familyGroupId, content }),
     });
     setSaving(false);
+
+    if (!res.ok) return;
+
     setContent("");
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
+    router.refresh();
   }
 
   return (

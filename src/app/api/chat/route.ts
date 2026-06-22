@@ -90,6 +90,9 @@ export async function POST(req: Request): Promise<Response> {
     model: openai("gpt-4o-mini"),
     system: systemEntry.content,
     messages: conversationMessages,
+    // Hard ceiling so no single response — regardless of cause — can run
+    // away unbounded and overwhelm the client.
+    maxOutputTokens: 800,
   });
 
   return result.toTextStreamResponse();

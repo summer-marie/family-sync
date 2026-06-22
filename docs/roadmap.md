@@ -464,12 +464,12 @@ Update these as you go. Add a short note when something blocks a step.
 - [x] Capture E2E green — 2/2 passing
 
 ### Step 5 - AI Schedule Chat (spec 001)
-- [ ] Write failing integration tests for `app/api/chat/route.ts`
-- [ ] Capture `07-ai-chat-red.txt`
-- [ ] Implement route handler and prompt builder to green
-- [ ] Write failing E2E tests
-- [ ] Capture `07-ai-chat-e2e-red.txt`
-- [ ] Implement chat UI to green
+- [x] Write failing integration tests for `app/api/chat/route.ts`
+- [x] Capture `07-ai-chat-red.txt`
+- [x] Implement route handler and prompt builder to green
+- [x] Write failing E2E tests
+- [x] Capture `07-ai-chat-e2e-red.txt`
+- [x] Implement chat UI to green
 
 ### Step 6 - Shared Notes (spec 005)
 - [x] Confirm `SharedNote` model
@@ -477,9 +477,9 @@ Update these as you go. Add a short note when something blocks a step.
 - [x] Write failing integration tests
 - [x] Capture `13-shared-notes-red.txt`
 - [x] Implement to green
-- [ ] Write failing E2E tests
-- [ ] Capture `13-shared-notes-e2e-red.txt`
-- [ ] Implement to green
+- [x] Write failing E2E tests
+- [x] Capture `13-shared-notes-e2e-red.txt`
+- [x] Implement to green
 
 ### Issues and notes
 - (Add blocker notes here as they come up.)
@@ -489,46 +489,30 @@ Update these as you go. Add a short note when something blocks a step.
 ## Refactor Steps
 
 ### Chat Refactor — Open-Ended AI Chat (spec 006)
-- [ ] Delete `question-parser.ts` and its tests — commit: `refactor: remove question-parser gate from AI chat route`
-- [ ] Write failing unit tests for prompt-builder and route — capture `14-ai-chat-refactor-red.txt`
-- [ ] Commit: `test: red — prompt-builder and chat route refactor tests`
-- [ ] Implement prompt-builder rewrite and route update to green — capture `14-ai-chat-refactor-green.txt`
-- [ ] Commit: `feat: open-ended AI chat with system prompt and multi-turn memory`
-- [ ] Write failing Playwright E2E tests — capture `14-ai-chat-refactor-e2e-red.txt`
-- [ ] Commit: `test: red — E2E tests for open-ended AI chat refactor`
-- [ ] Implement UI changes (multi-turn ChatWidget, chat thread UI) to green — capture `14-ai-chat-refactor-e2e-green.txt`
-- [ ] Commit: `feat: 90-day schedule fetch, session-cached schedule, multi-turn chat UI`
+- [x] Delete `question-parser.ts` and its tests — commit: `refactor: remove question-parser gate from AI chat route`
+- [x] Write failing unit tests for prompt-builder and route — capture `14-ai-chat-refactor-red.txt`
+- [x] Commit: `test: red — prompt-builder and chat route refactor tests`
+- [x] Implement prompt-builder rewrite and route update to green — capture `14-ai-chat-refactor-green.txt`
+- [x] Commit: `feat: open-ended AI chat with system prompt and multi-turn memory`
+- [x] Write failing Playwright E2E tests — capture `14-ai-chat-refactor-e2e-red.txt`
+- [x] Commit: `test: red — E2E tests for open-ended AI chat refactor`
+- [x] Implement UI changes (multi-turn ChatWidget, chat thread UI) to green — capture `14-ai-chat-refactor-e2e-green.txt`
+- [x] Commit: `feat: 90-day schedule fetch, session-cached schedule, multi-turn chat UI`
 - Spec: `docs/specs/006-ai-chat-refactor.md`
 
 ### Email Invites via Resend (spec 007)
-- [ ] Add `token` and `status` fields to `Invite` schema, apply migration — commit: `chore: add invite token and status fields to schema`
-- [ ] Write failing unit and integration tests — capture `15-email-invites-red.txt`
-- [ ] Commit: `test: red — email invite service and accept flow tests`
-- [ ] Implement Resend client, email sender, invite service update, accept action to green — capture `15-email-invites-green.txt`
-- [ ] Commit: `feat: email invite sending and accept flow`
-- [ ] Write failing Playwright E2E tests — capture `15-email-invites-e2e-red.txt`
-- [ ] Commit: `test: red — E2E tests for email invite flow`
-- [ ] Implement accept invite page and Members page status badges to green — capture `15-email-invites-e2e-green.txt`
-- [ ] Commit: `feat: accept invite page and members page status badges`
+- [x] Add `token` and `status` fields to `Invite` schema, apply migration — commit: `chore: add invite token and status fields to schema`
+- [x] Write failing unit and integration tests — capture `15-email-invites-red.txt`
+- [x] Commit: `test: red — email invite service and accept flow tests`
+- [x] Implement Resend client, email sender, invite service update, accept action to green — capture `15-email-invites-green.txt`
+- [x] Commit: `feat: email invite sending and accept flow`
+- [x] Write failing Playwright E2E tests — capture `15-email-invites-e2e-red.txt`
+- [x] Commit: `test: red — E2E tests for email invite flow`
+- [x] Implement accept invite page and Members page status badges to green — capture `15-email-invites-e2e-green.txt`
+- [x] Commit: `feat: accept invite page and members page status badges`
 - Spec: `docs/specs/007-email-invites.md`
 
----
-
-## Refactor Steps
-
-### Chat Refactor — Open-Ended AI Chat (spec 006)
-- [ ] Delete `question-parser.ts` and its tests — commit: `refactor: remove question-parser gate from AI chat route`
-- [ ] Write failing unit tests for prompt-builder and route — capture `14-ai-chat-refactor-red.txt`
-- [ ] Commit: `test: red — prompt-builder and chat route refactor tests`
-- [ ] Implement prompt-builder rewrite and route update to green — capture `14-ai-chat-refactor-green.txt`
-- [ ] Commit: `feat: open-ended AI chat with system prompt and multi-turn memory`
-- [ ] Write failing Playwright E2E tests — capture `14-ai-chat-refactor-e2e-red.txt`
-- [ ] Commit: `test: red — E2E tests for open-ended AI chat refactor`
-- [ ] Implement UI changes (90-day fetch, schedule prop, multi-turn ChatWidget) to green — capture `14-ai-chat-refactor-e2e-green.txt`
-- [ ] Commit: `feat: 90-day schedule fetch, session-cached schedule, multi-turn chat UI`
-- Spec: `docs/specs/006-ai-chat-refactor.md`
-
-### Email Invites via Resend (spec 007)
+### Email Invites via Resend (spec 007) — detail
 - What: replace the current no-op invite flow (creates a DB record but sends nothing) with real email delivery via Resend. Invited person receives a link, signs in with Google, lands on a confirmation page, and is added to the family group on accept. Adds `token` and `status` fields to `Invite`, a Resend email sender, an accept invite page, and status badges on the Members page.
 - Depends on: existing invite infrastructure (Step 2 complete).
 - Files: `prisma/schema.prisma` (token + status), `src/lib/resend.ts` (new), `src/lib/email/send-invite-email.ts` (new), `src/features/family/services.ts`, `src/app/invite/[token]/page.tsx` (new), `src/app/invite/[token]/actions.ts` (new), `src/app/family/page.tsx`.
@@ -539,3 +523,46 @@ Update these as you go. Add a short note when something blocks a step.
 - Protected: YES — Prisma schema migration, invite service.
 - TDD stop commits (in order): schema migration → red unit/integration tests → green implementation → red E2E → green E2E.
 - Spec: `docs/specs/007-email-invites.md`
+
+---
+
+## Branch Summary: `chore/bug-fixes`
+
+Summary of work completed on this branch, generated from its commit history.
+
+**Bug fixes**
+- Fixed an empty-chat-response bug caused by a stream-protocol mismatch between the server's `toTextStreamResponse()` (plain text) and the client's parser (expected a `0:`-prefixed protocol) — the client now decodes raw text directly.
+- Fixed Google Calendar connections silently showing "Not connected" once an access token expired — `getGoogleAccessToken` now checks `expires_at` and refreshes automatically via the stored `refresh_token`, with no user-facing reconnect step for routine expiry.
+- Fixed the sidenav rendering on the unauthenticated homepage with an empty shell and unnecessary content offset — now hidden entirely until a session exists.
+- Fixed the AI chat summarizing a recurring event (e.g. "Gym Days") as dozens of raw individual lines instead of a pattern, which had caused an oversized, near-runaway response. Added a hard cap on both server (`maxOutputTokens`) and client (`MAX_RESPONSE_CHARS`) as defense-in-depth against any future oversized response.
+
+**Permissions and access changes**
+- Changed invite permissions so any family group member can send invites, not just the organizer.
+
+**Feature: shared notes redesign**
+- Removed the one-note-per-family-group schema constraint; `SharedNote` rows are no longer upserted but created fresh each save, so notes now behave as multiple cards (added `createdAt`, changed the `FamilyGroup` relation from one-to-one to one-to-many).
+- Added `listNotes` to fetch all cards for a group, newest first, each attributed to its author.
+- Moved notes out of the Members page into their own `/notes` page, with its own two-column desktop layout (mirroring `/schedule`), linked from the sidenav.
+- Fixed `NotesForm` to check the response status and call `router.refresh()` after saving, so new cards appear immediately instead of requiring a manual reload.
+
+**Schedule page redesign (desktop/browser only, mobile unchanged)**
+- Restructured `/schedule` into a two-column layout: Visibility Settings + AI chat in a fixed-width left column, an independently-scrolling schedule panel on the right.
+- Grouped schedule events by day so multiple same-day events sit together under one date heading, and days with nothing scheduled now show "Free" instead of disappearing.
+- Added start–end time ranges (or "All day") to each event instead of a single ambiguous timestamp.
+- Added a themed amber/brown scrollbar to the schedule panel and a hidden scrollbar to the chat input/thread for a cleaner look.
+
+**AI chat improvements**
+- Capped the chat panel to a fixed height so it stops growing with long responses; the thread scrolls within that fixed area instead.
+- Added markdown rendering (`react-markdown`) for AI responses — bold names/titles and bullet lists — with a matching system-prompt instruction to format responses that way.
+
+**Styling convention**
+- Documented a new rem/viewport-unit styling rule in `CLAUDE.md` (rem first, viewport units for window-relative sizing, px only for true exceptions like hairline borders or exact DOM-pixel measurements) and swept the app to follow it — corner radii, the chat textarea's max-height, the schedule column widths, and the scrollbar sizing.
+
+**New pages**
+- Added FAQ and Privacy pages, written to reflect actual app behavior (read-only Google access, no event storage, privacy filtering before AI/sharing). Linked from the desktop sidebar; linked from the Members page on mobile, since the primary mobile tab bar has no spare room for secondary links.
+
+**Process and documentation**
+- Added a Required Checkpoint Sequence to `docs/tdd-workflow.md` (summarize → wait for approval → RED → stop for a commit → GREEN → stop for a commit) and a hard rule in `CLAUDE.md` that the AI must never run `git commit`/`git push` on its own initiative.
+- Rewrote `README.md` with a project pitch, the app's story, tech stack, a quick-start guide, the TDD approach, schema relationships, project structure, how the AI coding agent fits into the workflow under rules-file control, and MVP scope vs. future direction.
+- Synced `docs/project-plan.md` and `docs/personas-and-stories.md`'s user stories with actual behavior — corrected the invite-permission and calendar-reconnection stories, narrowed the group-management story to what's actually built, and added a new story for the FAQ/Privacy pages.
+- Fixed stale schema comments in `prisma/schema.prisma` that described pre-refactor behavior (claimed one note per family group; claimed no silent token refresh) so they match the current implementation.

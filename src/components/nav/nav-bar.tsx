@@ -12,7 +12,7 @@ async function SignOutButton() {
     <form action={handleSignOut}>
       <button
         type="submit"
-        className="w-full rounded-[10px] px-4 py-3 text-left text-sm text-secondary hover:bg-row"
+        className="w-full rounded-[0.625rem] px-4 py-3 text-left text-sm text-secondary hover:bg-row"
       >
         Sign out
       </button>
@@ -26,7 +26,7 @@ export async function NavBar() {
 
   return (
     <>
-      {/* Desktop sidebar — fixed, 256px wide */}
+      {/* Desktop sidebar — fixed, 16rem wide */}
       <aside
         className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col lg:flex"
         style={{
@@ -50,6 +50,16 @@ export async function NavBar() {
             <nav className="flex-1 px-3">
               <NavLinks />
             </nav>
+          )}
+
+          {/* Secondary links (FAQ, Privacy) — desktop only */}
+          {session?.user && (
+            <div
+              className="px-3 pt-4"
+              style={{ borderTop: "1px solid rgba(255, 220, 160, 0.08)" }}
+            >
+              <NavLinks secondary />
+            </div>
           )}
 
           {/* User info + sign out */}

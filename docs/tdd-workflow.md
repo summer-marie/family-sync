@@ -11,6 +11,20 @@ Vitest will be used for fast unit and integration tests, while Playwright will b
 - Log each test-writing prompt used during development.
 - Keep commits clearly separated into test creation, implementation, and cleanup or debugging stages.
 
+## Required Checkpoint Sequence
+
+This sequence applies whenever TDD is in effect for a piece of work (i.e. it has not been explicitly waived for a small, non-TDD fix). The agent must stop and wait for explicit approval at each checkpoint below — it must never skip a checkpoint, combine two checkpoints into one turn, or continue on its own judgment past a stop point.
+
+1. **Summarize the proposed change.** Before writing any test or code, restate the feature/fix and the planned approach. Stop. Wait for explicit approval before proceeding.
+2. **Write the failing test(s) only.** No implementation code yet — test files only.
+3. **Run the tests and confirm RED.** Show the failing output as proof the gap is real.
+4. **Stop.** Give a suggested commit message for the RED state. Wait for the user to commit. The agent does not commit, push, or otherwise advance git state itself — see the Git Reminder rule in `CLAUDE.md`.
+5. **Only after the user confirms they're ready to continue**, write the minimal implementation needed to pass the approved tests — nothing extra, no incidental refactors bundled in.
+6. **Re-run the tests and confirm GREEN.**
+7. **Stop.** Give a suggested commit message for the GREEN state. Wait for the user to commit before considering the task finished.
+
+If at any point the agent is unsure whether a checkpoint has been cleared, it must ask rather than assume and continue.
+
 ## Test-Writing Prompts
 
 ### AI Schedule Chat

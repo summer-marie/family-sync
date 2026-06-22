@@ -32,3 +32,39 @@
     color: #f0ebe4;
   }
 }
+
+/* Schedule panel scrollbar — amber thumb on brown track, matching the app's
+   accent and card colors. Scoped to .schedule-scroll only. */
+.schedule-scroll {
+  scrollbar-color: #d4a853 #2a2520;
+  scrollbar-width: thin;
+}
+
+.schedule-scroll::-webkit-scrollbar {
+  width: 0.5rem;
+}
+
+.schedule-scroll::-webkit-scrollbar-track {
+  background-color: #2a2520;
+  border-radius: 0.5rem;
+}
+
+.schedule-scroll::-webkit-scrollbar-thumb {
+  background-color: #d4a853;
+  border-radius: 0.5rem;
+}
+
+.schedule-scroll::-webkit-scrollbar-thumb:hover {
+  background-color: #e8c97a;
+}
+
+/* Hides the scrollbar while keeping the element scrollable — used by the
+   chat input (auto-grows up to its max height) and the chat thread (caps at
+   a fixed height once the panel is full), so both scroll invisibly. */
+.scrollbar-hidden {
+  scrollbar-width: none;
+}
+
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+}
