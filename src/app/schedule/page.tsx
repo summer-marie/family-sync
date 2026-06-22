@@ -24,6 +24,64 @@ import { ConnectCalendarButton } from "@/components/schedule/connect-calendar-bu
 // MVP constraints: pull-on-demand only, no background sync, 7-day window.
 // ---------------------------------------------------------------------------
 
+type TimedEvent = { start: string; end: string; isAllDay: boolean };
+
+// Renders "All day" or an event's start–end time range (date shown separately
+// as the day-group heading, so it's omitted here).
+function formatEventTimeRange(event: TimedEvent): string {
+  if (event.isAllDay) {
+    return "All day";
+  }
+
+  const startTime = new Date(event.start).toLocaleTimeString([], {
+    hour: "numeric",
+    minute: "2-digit",
+  });
+  const endTime = new Date(event.end).toLocaleTimeString([], {
+    hour: "numeric",
+    minute: "2-digit",
+  });
+
+  return `${startTime} – ${endTime}`;
+}
+
+function isSameDay(a: Date, b: Date): boolean {
+  return (
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+  );
+}
+
+// Buckets events into one entry per calendar day for the next `days` days
+// starting from `startDate`, so every day shows up — even ones with nothing
+// scheduled — rather than only days that have events.
+function groupEventsByDay<T extends TimedEvent>(
+  events: T[],
+  startDate: Date,
+  days = 7,
+): { date: Date; events: T[] }[] {
+  const buckets = Array.from({ length: days }, (_, i) => {
+    const date = new Date(startDate);
+    date.setDate(date.getDate() + i);
+    return { date, events: [] as T[] };
+  });
+
+  for (const event of events) {
+    const eventDate = new Date(event.start);
+    const bucket = buckets.find((b) => isSameDay(b.date, eventDate));
+    if (bucket) bucket.events.push(event);
+  }
+
+  for (const bucket of buckets) {
+    bucket.events.sort(
+      (a, b) => new Date(a.start).getTime() - new Date(b.start).getTime(),
+    );
+  }
+
+  return buckets;
+}
+
 function VisibilityToggle({ isBusyOnly }: { isBusyOnly: boolean }) {
   return (
     <section
@@ -298,23 +356,36 @@ export default async function SchedulePage() {
                   <div className="mb-3 font-semibold text-primary">{name}</div>
                   {entry.status === "unavailable" ? (
                     <p className="text-sm italic text-muted">Not connected</p>
-                  ) : entry.events.length === 0 ? (
-                    <p className="text-sm italic text-muted">
-                      No events this week
-                    </p>
                   ) : (
-                    <ul className="space-y-2">
-                      {entry.events.map((event, i) => (
-                        <li
-                          key={i}
-                          className="rounded-r-md bg-row py-2 pl-3 pr-3 text-sm text-secondary"
-                          style={{ borderLeft: "2px solid #d4a853" }}
-                        >
-                          <span className="font-medium text-primary">
-                            {event.title}
-                          </span>
-                          {" — "}
-                          {new Date(event.start).toLocaleString()}
+                    <ul className="space-y-3">
+                      {groupEventsByDay(entry.events, now).map((day) => (
+                        <li key={day.date.toDateString()}>
+                          <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted">
+                            {day.date.toLocaleDateString(undefined, {
+                              weekday: "short",
+                              month: "numeric",
+                              day: "numeric",
+                            })}
+                          </div>
+                          {day.events.length === 0 ? (
+                            <p className="text-sm italic text-muted">Free</p>
+                          ) : (
+                            <ul className="space-y-2">
+                              {day.events.map((event, i) => (
+                                <li
+                                  key={i}
+                                  className="rounded-r-md bg-row py-2 pl-3 pr-3 text-sm text-secondary"
+                                  style={{ borderLeft: "2px solid #d4a853" }}
+                                >
+                                  <span className="font-medium text-primary">
+                                    {event.title}
+                                  </span>
+                                  {" — "}
+                                  {formatEventTimeRange(event)}
+                                </li>
+                              ))}
+                            </ul>
+                          )}
                         </li>
                       ))}
                     </ul>
