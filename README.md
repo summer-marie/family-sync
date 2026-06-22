@@ -1,3 +1,58 @@
+# Family Sync
+
+A privacy-first family calendar hub with an AI schedule chat. It lets family members connect their Google Calendars, see a shared schedule, and ask natural-language questions about availability — without anyone being forced to expose every detail of their personal calendar or waiting for people to be available to text/call you back to answer.
+
+## The Story
+
+**Problem:** families juggle separate personal Google Calendars. Figuring out who's free means manually cross-referencing multiple calendars, or oversharing by giving everyone full access to every event.
+
+**Who it's for:** families and households who want shared visibility into each other's availability without exposing every event's details to everyone.
+
+**How it helps:** once a few family members connect their calendars, anyone in the group can see combined availability at a glance, ask the AI assistant natural-language questions like "is anyone free Friday afternoon?", and each person individually controls whether their event titles are visible or just shown as busy/free — privacy isn't an afterthought, it's enforced before any data reaches the shared view or the AI.
+
+## Tech Stack
+
+- **Next.js** (App Router) — frontend and backend routes
+- **Prisma ORM** with **Neon Postgres** — data layer
+- **Auth.js** — authentication via Google OAuth
+- **Google Calendar API** — calendar connection and event reads
+- **Vercel AI SDK** (`streamText`) — AI schedule chat, streamed responses
+- **Vercel** — hosting
+- **Vitest** — unit/integration tests
+- **Playwright** — end-to-end tests
+
+## Getting Started
+
+1. **Install dependencies**
+   ```powershell
+   npm install
+   ```
+
+2. **Set up environment variables** — copy `.env.example` to `.env` and fill in:
+   - `DATABASE_URL` / `DIRECT_URL` — your Neon Postgres connection strings (pooled and direct)
+   - `AUTH_SECRET` — a generated secret (`npx auth secret`)
+   - `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` — from a Google Cloud OAuth client
+   - `NEXTAUTH_URL` — `http://localhost:3000` for local dev
+   - `OPENAI_API_KEY` — for the AI schedule chat
+   - `RESEND_API_KEY` / `RESEND_FROM_EMAIL` — for sending invite emails
+
+3. **Apply the database schema**
+   ```powershell
+   npx prisma migrate dev
+   ```
+
+4. **Run the app**
+   ```powershell
+   npm run dev
+   ```
+   Visit `http://localhost:3000`.
+
+5. **Run tests**
+   ```powershell
+   npx vitest run        # unit/integration
+   npx playwright test   # end-to-end
+   ```
+
 ## Testing & TDD Approach
 
 This project follows a test-first workflow, governed by `AGENTS.md` (repo-wide rules), `CLAUDE.md` (Claude-specific extensions), and `docs/tdd-workflow.md` (the process itself). For each feature, the AI coding agent was required to read the relevant spec and these rule files before writing any code, write the test first, run it to confirm a failing (RED) state, then implement only enough to pass (GREEN).
@@ -27,6 +82,10 @@ src/
 ├── generated/    Auto-generated Prisma client (not hand-edited)
 └── test/         Shared test factories and stubs
 ```
+
+## How the AI Coding Agent Fits In
+
+Development used an AI coding agent (Claude) operating under explicit, version-controlled rules rather than free rein. `AGENTS.md` defines repo-wide conventions; `CLAUDE.md` extends those with Claude-specific guidance — required reading order, TDD enforcement, "risky areas" (auth, schema, privacy logic) that require explicit confirmation before changes, and protected areas like test integrity. The agent drafted tests and implementations from specs, but schema changes, broad refactors, and anything touching privacy enforcement required the developer's explicit sign-off before proceeding — the rules files are the mechanism for keeping a human in control of an AI-assisted workflow, not just a style guide.
 
 ## MVP Scope & Future Direction
 
