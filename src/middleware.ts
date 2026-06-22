@@ -12,7 +12,11 @@ import type { NextRequest } from "next/server";
 // level privacy enforcement must live in the reusable server-side utility."
 // ---------------------------------------------------------------------------
 
+// Auth.js renames the session cookie with a "__Secure-" prefix whenever the
+// app is served over HTTPS (production), but uses the plain name over HTTP
+// (local dev). Both must be checked or production auth checks always fail.
 const SESSION_COOKIE = "authjs.session-token";
+const SECURE_SESSION_COOKIE = "__Secure-authjs.session-token";
 
 const PROTECTED_PREFIXES = ["/family", "/schedule"];
 
@@ -23,7 +27,8 @@ export function middleware(req: NextRequest) {
   );
 
   if (isProtected) {
-    const sessionCookie = req.cookies.get(SESSION_COOKIE);
+    const sessionCookie =
+      req.cookies.get(SECURE_SESSION_COOKIE) ?? req.cookies.get(SESSION_COOKIE);
     if (!sessionCookie?.value) {
       // Redirect unauthenticated users to the home page
       return NextResponse.redirect(new URL("/", nextUrl));

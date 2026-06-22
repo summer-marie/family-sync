@@ -180,6 +180,7 @@ export async function inviteMember(input: {
   familyGroupId: string;
   email: string;
   inviterName?: string;
+  inviterEmail?: string;
   familyName?: string;
 }) {
   validateEmail(input.email);
