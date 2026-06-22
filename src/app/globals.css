@@ -58,12 +58,13 @@
   background-color: #e8c97a;
 }
 
-/* Chat input — auto-grows up to its max height; scrolling past that point
-   stays functional but invisible, matching a typical messaging app input. */
-.chat-input-scroll {
+/* Hides the scrollbar while keeping the element scrollable — used by the
+   chat input (auto-grows up to its max height) and the chat thread (caps at
+   a fixed height once the panel is full), so both scroll invisibly. */
+.scrollbar-hidden {
   scrollbar-width: none;
 }
 
-.chat-input-scroll::-webkit-scrollbar {
+.scrollbar-hidden::-webkit-scrollbar {
   display: none;
 }

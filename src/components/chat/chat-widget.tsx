@@ -180,7 +180,7 @@ export function ChatWidget({ familyGroupId, familyName, schedule }: Props) {
   return (
     <section
       aria-label="AI Schedule Chat"
-      className="mt-10 flex flex-col rounded-[0.625rem] p-6 lg:mt-0 lg:min-h-[34rem]"
+      className="mt-10 flex flex-col rounded-[0.625rem] p-6 lg:mt-0 lg:h-[34rem]"
       style={{
         background:
           "linear-gradient(135deg, #1e1510 0%, #1a1520 50%, #141020 100%)",
@@ -195,7 +195,7 @@ export function ChatWidget({ familyGroupId, familyName, schedule }: Props) {
       <div
         ref={threadRef}
         data-testid="chat-thread"
-        className="mb-4 max-h-120 overflow-y-auto space-y-3 lg:max-h-none lg:flex-1"
+        className="scrollbar-hidden mb-4 max-h-120 overflow-y-auto space-y-3 lg:max-h-none lg:flex-1"
       >
         {/* Completed message turns */}
         {messages.map((msg, i) =>
@@ -316,7 +316,7 @@ export function ChatWidget({ familyGroupId, familyName, schedule }: Props) {
           placeholder="Ask a question about the schedule"
           disabled={isStreaming}
           rows={1}
-          className="chat-input-scroll flex-1 resize-none overflow-y-auto rounded-lg px-3 py-2 text-sm text-primary placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-ai/60 disabled:opacity-50"
+          className="scrollbar-hidden flex-1 resize-none overflow-y-auto rounded-lg px-3 py-2 text-sm text-primary placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-ai/60 disabled:opacity-50"
           style={{
             backgroundColor: "#1e1b16",
             border: "1px solid rgba(124, 92, 191, 0.30)",
