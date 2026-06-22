@@ -89,7 +89,8 @@ export function ChatWidget({ familyGroupId, familyName, schedule }: Props) {
         return;
       }
 
-      // Vercel AI SDK text stream: lines prefixed with "0:<json-string>\n"
+      // toTextStreamResponse() sends raw plain-text chunks — no protocol
+      // prefix to parse, just decode and append as it arrives.
       const reader = res.body?.getReader();
       const decoder = new TextDecoder();
       let accumulated = "";
@@ -97,18 +98,8 @@ export function ChatWidget({ familyGroupId, familyName, schedule }: Props) {
       while (reader) {
         const { done, value } = await reader.read();
         if (done) break;
-        const chunk = decoder.decode(value, { stream: true });
-        for (const line of chunk.split("\n")) {
-          if (line.startsWith("0:")) {
-            try {
-              const text = JSON.parse(line.slice(2)) as string;
-              accumulated += text;
-              setStreamingContent(accumulated);
-            } catch {
-              // Skip malformed chunks — partial reads can split JSON tokens.
-            }
-          }
-        }
+        accumulated += decoder.decode(value, { stream: true });
+        setStreamingContent(accumulated);
       }
 
       setMessages((prev) => [
