@@ -156,6 +156,9 @@ model Invite {
 //   @@unique([userId, provider]). For MVP, provider is always "google".
 // - Calendar data is fetched live from Google on request (pull-on-demand).
 //   No background sync, no webhooks, no Neon mirror as the default.
+// - The Account model (Auth.js) holds the OAuth tokens this connection reads
+//   through; getGoogleAccessToken refreshes an expired access_token using
+//   the stored refresh_token automatically, with no user-facing reconnect step.
 //
 // Visibility (Step 4 - spec 004):
 // - Binary per connection: FULL exposes event titles; BUSY_ONLY replaces
@@ -166,8 +169,6 @@ model Invite {
 // Failed/expired reads:
 // - On a failed or expired Google read, the service returns a privacy-safe
 //   `unavailable` state rather than leaking partial or stale data.
-// - There is NO silent token auto-refresh. Reconnect = the user
-//   re-authenticates via Google OAuth.
 // ---------------------------------------------------------------------------
 
 model CalendarConnection {
@@ -201,15 +202,15 @@ enum Visibility {
 }
 
 // ---------------------------------------------------------------------------
-// Shared family note (Step 6 - spec 005)
+// Shared family notes (Step 6 - spec 005)
 //
 // MVP rules:
-// - One note per family group, enforced at the DB level by @unique on
-//   familyGroupId.
+// - A family group can have many notes, each its own row (shown as cards) —
+//   saving adds a new note rather than overwriting a prior one.
 // - Content defaults to empty string; an empty note is valid.
-// - updatedByUserId tracks the last editor. No history is stored for MVP.
+// - updatedByUserId attributes the note to its author for display.
 // - onDelete: Cascade on the family group relation: deleting the group also
-//   deletes the note.
+//   deletes its notes.
 // ---------------------------------------------------------------------------
 
 model SharedNote {
