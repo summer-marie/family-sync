@@ -66,6 +66,7 @@ export async function inviteMemberAction(formData: FormData): Promise<void> {
       familyGroupId,
       email,
       inviterName,
+      inviterEmail: session.user.email ?? undefined,
       familyName,
     });
   } catch (error) {
