@@ -65,11 +65,7 @@ As the app was refactored throughout development (schema changes, permission cha
 
 ## Database Schema & Relationships
 
-- **User / Account / Session** — standard Auth.js identity tables. `Account` stores the Google OAuth tokens (including the refresh token used to silently renew expired access tokens).
-- **FamilyGroup ↔ GroupMembership ↔ User** — `GroupMembership` is the join table connecting users to family groups, carrying a `role` (ORGANIZER or MEMBER). For MVP, a unique constraint limits each user to one family group.
-- **Invite** — belongs to a `FamilyGroup`, independent of `GroupMembership`. An invite is onboarding evidence, not an access boundary — actual access is only ever granted once an invite is accepted and a `GroupMembership` row is created.
-- **CalendarConnection** — one per user per provider (Google only for MVP), holding connection status and a privacy `visibility` setting (FULL or BUSY_ONLY). Actual calendar events are never stored here or anywhere in the database — they're fetched live from Google on request; this table only tracks the connection and permission state.
-- **SharedNote** — many notes per `FamilyGroup`, each attributed to the `User` who wrote it, displayed as cards to all members.
+See [`prisma/SCHEMA.md`](prisma/SCHEMA.md) for the full breakdown of tables, relationships, and the reasoning behind each constraint — including why calendar events are never stored in the database, why invites are decoupled from membership, and why notes are append-only.
 
 ## Project Structure
 
