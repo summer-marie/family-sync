@@ -253,6 +253,15 @@ Do not use bash-specific syntax such as:
 
 When suggesting commands, use PowerShell-compatible forms and call out any cross-platform differences if relevant.
 
+## Styling Units
+
+Use dynamic, relative sizing throughout the app rather than fixed pixel values.
+
+- Use `rem` for sizing (widths, heights, padding, margin, border-radius, font-size, gaps) so layout scales with the user's root font size instead of being locked to a fixed pixel grid.
+- Use viewport-relative units (`vh`, `vw`, `calc(100vh - ...)`, etc.) when sizing needs to respond to the visible window, such as panels that should fill remaining viewport height.
+- Use `px` only when a value must be exact and unaffected by scaling — e.g. 1px hairline borders, or matching a fixed external constraint (like an icon's native pixel dimensions).
+- When converting or introducing new sizing, prefer `rem` first, then viewport units, and fall back to `px` only when neither fits.
+
 ## Code Comments
 
 In new or heavily modified code, add concise professional comments where they improve clarity.

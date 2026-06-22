@@ -85,7 +85,7 @@ function groupEventsByDay<T extends TimedEvent>(
 function VisibilityToggle({ isBusyOnly }: { isBusyOnly: boolean }) {
   return (
     <section
-      className="mb-6 rounded-[10px] p-4"
+      className="mb-6 rounded-[0.625rem] p-4"
       style={{
         backgroundColor: "#1e1b16",
         border: "1px solid rgba(255, 220, 160, 0.10)",
@@ -157,7 +157,7 @@ export default async function SchedulePage() {
 
         {hasConnectionError && (
           <section
-            className="mb-6 rounded-[10px] p-4"
+            className="mb-6 rounded-[0.625rem] p-4"
             style={{
               backgroundColor: "#1e1b16",
               border: "1px solid rgba(255, 220, 160, 0.10)",
@@ -176,7 +176,7 @@ export default async function SchedulePage() {
 
         {!myConnection && (
           <section
-            className="mb-6 rounded-[10px] p-4"
+            className="mb-6 rounded-[0.625rem] p-4"
             style={{
               backgroundColor: "#1e1b16",
               border: "1px solid rgba(255, 220, 160, 0.10)",
@@ -208,7 +208,7 @@ export default async function SchedulePage() {
           </p>
           <ul aria-label="schedule members" className="space-y-3">
             <li
-              className="rounded-[10px] p-4"
+              className="rounded-[0.625rem] p-4"
               style={{
                 backgroundColor: "#1e1b16",
                 border: "1px solid rgba(255, 220, 160, 0.10)",
@@ -254,7 +254,7 @@ export default async function SchedulePage() {
   return (
     <main className="mx-auto px-4 py-8 lg:max-w-6xl">
       <div className="flex flex-col lg:flex-row lg:items-end lg:gap-6">
-        <div className="lg:w-[360px] lg:shrink-0">
+        <div className="lg:w-[28.75rem] lg:shrink-0">
           <h1 className="mb-1 text-2xl font-bold text-primary md:text-3xl">
             Family Schedule
           </h1>
@@ -267,7 +267,7 @@ export default async function SchedulePage() {
 
       {hasConnectionError && (
         <section
-          className="mb-6 rounded-[10px] p-4"
+          className="mb-6 rounded-[0.625rem] p-4"
           style={{
             backgroundColor: "#1e1b16",
             border: "1px solid rgba(255, 220, 160, 0.10)",
@@ -286,7 +286,7 @@ export default async function SchedulePage() {
 
       {!myConnection && (
         <section
-          className="mb-6 rounded-[10px] p-4"
+          className="mb-6 rounded-[0.625rem] p-4"
           style={{
             backgroundColor: "#1e1b16",
             border: "1px solid rgba(255, 220, 160, 0.10)",
@@ -308,7 +308,7 @@ export default async function SchedulePage() {
           family schedule never pushes the chat out of view. Mobile keeps the
           original single stacked column (unchanged below lg). */}
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
-        <div className="flex flex-col gap-3 lg:w-[360px] lg:shrink-0">
+        <div className="flex flex-col gap-3 lg:w-[28.75rem] lg:shrink-0">
           {myConnection && (
             <VisibilityToggle
               isBusyOnly={myConnection.visibility === "BUSY_ONLY"}
@@ -347,7 +347,7 @@ export default async function SchedulePage() {
               return (
                 <li
                   key={entry.userId}
-                  className="rounded-[10px] p-4"
+                  className="rounded-[0.625rem] p-4"
                   style={{
                     backgroundColor: "#1e1b16",
                     border: "1px solid rgba(255, 220, 160, 0.10)",

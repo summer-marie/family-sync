@@ -41,17 +41,17 @@
 }
 
 .schedule-scroll::-webkit-scrollbar {
-  width: 8px;
+  width: 0.5rem;
 }
 
 .schedule-scroll::-webkit-scrollbar-track {
   background-color: #2a2520;
-  border-radius: 8px;
+  border-radius: 0.5rem;
 }
 
 .schedule-scroll::-webkit-scrollbar-thumb {
   background-color: #d4a853;
-  border-radius: 8px;
+  border-radius: 0.5rem;
 }
 
 .schedule-scroll::-webkit-scrollbar-thumb:hover {

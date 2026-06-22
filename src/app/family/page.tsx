@@ -72,7 +72,7 @@ export default async function FamilyPage() {
       <section className="mb-8">
         <h2 className="mb-3 text-lg font-semibold text-primary">Members</h2>
         <ul
-          className="overflow-hidden rounded-[10px]"
+          className="overflow-hidden rounded-[0.625rem]"
           style={{
             backgroundColor: "#1e1b16",
             border: "1px solid rgba(255, 220, 160, 0.10)",
@@ -154,7 +154,7 @@ export default async function FamilyPage() {
             Pending Invites
           </h2>
           <ul
-            className="overflow-hidden rounded-[10px]"
+            className="overflow-hidden rounded-[0.625rem]"
             style={{
               backgroundColor: "#1e1b16",
               border: "1px solid rgba(255, 220, 160, 0.10)",

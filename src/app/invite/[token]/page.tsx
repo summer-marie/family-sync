@@ -110,7 +110,7 @@ export default async function AcceptInvitePage({ params }: Props) {
         <input type="hidden" name="token" value={token} />
         <button
           type="submit"
-          className="rounded-[10px] bg-amber px-6 py-3 font-semibold text-background transition-opacity hover:opacity-90"
+          className="rounded-[0.625rem] bg-amber px-6 py-3 font-semibold text-background transition-opacity hover:opacity-90"
         >
           Accept Invitation
         </button>

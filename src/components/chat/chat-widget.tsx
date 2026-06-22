@@ -59,7 +59,15 @@ type Props = {
   schedule?: ScheduleEntry[];
 };
 
-const MAX_TEXTAREA_HEIGHT = 120; // ~5 lines
+const MAX_TEXTAREA_HEIGHT_REM = 7.5; // ~5 lines
+
+// scrollHeight is always reported in px by the DOM, so the rem cap must be
+// converted to px to compare against it — the one place px is unavoidable.
+function getMaxTextareaHeightPx(): number {
+  const rootFontSize =
+    parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+  return MAX_TEXTAREA_HEIGHT_REM * rootFontSize;
+}
 
 // Hard ceiling on rendered response length. Protects the browser from any
 // runaway/oversized stream — regardless of why the server sent it — since
@@ -88,7 +96,8 @@ export function ChatWidget({ familyGroupId, familyName, schedule }: Props) {
     const el = textareaRef.current;
     if (!el) return;
     el.style.height = "auto";
-    el.style.height = Math.min(el.scrollHeight, MAX_TEXTAREA_HEIGHT) + "px";
+    el.style.height =
+      Math.min(el.scrollHeight, getMaxTextareaHeightPx()) + "px";
   }
 
   async function handleSubmit() {
@@ -171,7 +180,7 @@ export function ChatWidget({ familyGroupId, familyName, schedule }: Props) {
   return (
     <section
       aria-label="AI Schedule Chat"
-      className="mt-10 flex flex-col rounded-[10px] p-6 lg:mt-0 lg:min-h-[34rem]"
+      className="mt-10 flex flex-col rounded-[0.625rem] p-6 lg:mt-0 lg:min-h-[34rem]"
       style={{
         background:
           "linear-gradient(135deg, #1e1510 0%, #1a1520 50%, #141020 100%)",
@@ -311,7 +320,7 @@ export function ChatWidget({ familyGroupId, familyName, schedule }: Props) {
           style={{
             backgroundColor: "#1e1b16",
             border: "1px solid rgba(124, 92, 191, 0.30)",
-            maxHeight: `${MAX_TEXTAREA_HEIGHT}px`,
+            maxHeight: `${MAX_TEXTAREA_HEIGHT_REM}rem`,
           }}
         />
         <button

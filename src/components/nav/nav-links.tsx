@@ -39,7 +39,7 @@ export function NavLinks({ mobile = false }: { mobile?: boolean }) {
           <li key={href}>
             <Link
               href={href}
-              className={`flex items-center rounded-[10px] px-4 py-3 text-sm font-medium transition-colors ${
+              className={`flex items-center rounded-[0.625rem] px-4 py-3 text-sm font-medium transition-colors ${
                 isActive ? "" : "text-secondary hover:bg-row"
               }`}
               style={

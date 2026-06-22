@@ -12,7 +12,7 @@ async function SignOutButton() {
     <form action={handleSignOut}>
       <button
         type="submit"
-        className="w-full rounded-[10px] px-4 py-3 text-left text-sm text-secondary hover:bg-row"
+        className="w-full rounded-[0.625rem] px-4 py-3 text-left text-sm text-secondary hover:bg-row"
       >
         Sign out
       </button>
@@ -26,7 +26,7 @@ export async function NavBar() {
 
   return (
     <>
-      {/* Desktop sidebar — fixed, 256px wide */}
+      {/* Desktop sidebar — fixed, 16rem wide */}
       <aside
         className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col lg:flex"
         style={{
