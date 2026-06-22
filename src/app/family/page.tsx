@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { auth } from "@/auth";
 import {
   getMyFamilyGroup,
@@ -182,6 +183,20 @@ export default async function FamilyPage() {
           <InviteForm familyGroupId={familyGroup.id} />
         </section>
       )}
+
+      {/* FAQ/Privacy — desktop has these in the sidebar; this page has the
+          most spare room on mobile, so they're linked here instead. */}
+      <section
+        className="flex justify-center gap-6 pt-4 lg:hidden"
+        style={{ borderTop: "1px solid rgba(255, 220, 160, 0.10)" }}
+      >
+        <Link href="/faq" className="text-sm text-secondary hover:text-amber">
+          FAQ
+        </Link>
+        <Link href="/privacy" className="text-sm text-secondary hover:text-amber">
+          Privacy
+        </Link>
+      </section>
     </main>
   );
 }

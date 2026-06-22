@@ -52,6 +52,16 @@ export async function NavBar() {
             </nav>
           )}
 
+          {/* Secondary links (FAQ, Privacy) — desktop only */}
+          {session?.user && (
+            <div
+              className="px-3 pt-4"
+              style={{ borderTop: "1px solid rgba(255, 220, 160, 0.08)" }}
+            >
+              <NavLinks secondary />
+            </div>
+          )}
+
           {/* User info + sign out */}
           {session?.user && (
             <div

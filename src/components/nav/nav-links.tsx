@@ -9,13 +9,28 @@ const links = [
   { href: "/notes", label: "Notes" },
 ];
 
-export function NavLinks({ mobile = false }: { mobile?: boolean }) {
+// Secondary links — desktop sidebar only (see nav-bar.tsx). Mobile's bottom
+// tab bar has no room for these; on mobile they're linked from /family
+// instead, since that page has the most spare space.
+const secondaryLinks = [
+  { href: "/faq", label: "FAQ" },
+  { href: "/privacy", label: "Privacy" },
+];
+
+export function NavLinks({
+  mobile = false,
+  secondary = false,
+}: {
+  mobile?: boolean;
+  secondary?: boolean;
+}) {
   const pathname = usePathname();
+  const items = secondary ? secondaryLinks : links;
 
   if (mobile) {
     return (
       <div className="flex w-full">
-        {links.map(({ href, label }) => {
+        {items.map(({ href, label }) => {
           const isActive = pathname.startsWith(href);
           return (
             <Link
@@ -34,7 +49,7 @@ export function NavLinks({ mobile = false }: { mobile?: boolean }) {
 
   return (
     <ul className="space-y-1">
-      {links.map(({ href, label }) => {
+      {items.map(({ href, label }) => {
         const isActive = pathname.startsWith(href);
         return (
           <li key={href}>
